@@ -846,5 +846,31 @@ function confirmReset() {
   }
 }
 </script>
+
+<script>
+function confirmReset() {
+  if (confirm("คุณแน่ใจหรือไม่ว่าต้องการรีเซตทั้งหมด?")) {
+    // Clear localStorage
+    localStorage.removeItem('luxu_board');
+    localStorage.removeItem('luxu_players');
+    localStorage.removeItem('luxu_result');
+
+    // Clear UI elements
+    const outBox = document.querySelector('.outs-box');
+    if (outBox) {
+      outBox.innerHTML = '';
+    }
+
+    const boardSlots = document.querySelectorAll('#board .card-slot');
+    boardSlots.forEach(slot => slot.innerHTML = '');
+
+    const playerCards = document.querySelectorAll('.player-card');
+    playerCards.forEach(card => card.innerHTML = '');
+
+    // Delay 200ms to ensure DOM cleared before reload
+    setTimeout(() => location.reload(), 200);
+  }
+}
+</script>
 </body>
 </html>
