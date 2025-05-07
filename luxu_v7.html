@@ -490,5 +490,54 @@ function selectCard(cardCode) {
 }
 </script>
 
+
+<script>
+// ฟังก์ชันแปลงรหัสไพ่เป็นค่าตัวเลข
+const rankMap = { '2': 2, '3': 3, '4': 4, '5': 5, '6': 6, '7': 7,
+                  '8': 8, '9': 9, '10': 10, 'J': 11, 'Q': 12,
+                  'K': 13, 'A': 14 };
+
+// ประเมินแฮนด์ 5–7 ใบ → คืนค่าคะแนนและชื่อแฮนด์
+function evaluateHand(cards) {
+  let ranks = {}, suits = {}, values = [];
+
+  cards.forEach(card => {
+    const rank = card.slice(0, -1);
+    const suit = card.slice(-1);
+    const val = rankMap[rank];
+    ranks[rank] = (ranks[rank] || 0) + 1;
+    suits[suit] = (suits[suit] || 0) + 1;
+    values.push(val);
+  });
+
+  values.sort((a,b) => b-a);
+  const isFlush = Object.values(suits).some(c => c >= 5);
+  const isStraight = checkStraight(values);
+  const handCounts = Object.values(ranks).sort((a,b) => b-a).join('');
+
+  if (isFlush && isStraight && values.includes(14) && values.includes(10)) return { rank: 10, name: "Royal Flush" };
+  if (isFlush && isStraight) return { rank: 9, name: "Straight Flush" };
+  if (handCounts.startsWith("4")) return { rank: 8, name: "Four of a Kind" };
+  if (handCounts.startsWith("32")) return { rank: 7, name: "Full House" };
+  if (isFlush) return { rank: 6, name: "Flush" };
+  if (isStraight) return { rank: 5, name: "Straight" };
+  if (handCounts.startsWith("3")) return { rank: 4, name: "Three of a Kind" };
+  if (handCounts.startsWith("22")) return { rank: 3, name: "Two Pair" };
+  if (handCounts.startsWith("2")) return { rank: 2, name: "One Pair" };
+  return { rank: 1, name: "High Card" };
+}
+
+function checkStraight(values) {
+  const unique = [...new Set(values)];
+  for (let i = 0; i <= unique.length - 5; i++) {
+    if (unique[i] - unique[i + 4] === 4) return true;
+  }
+  // check wheel (A-2-3-4-5)
+  if (unique.includes(14) && unique.includes(2) && unique.includes(3) &&
+      unique.includes(4) && unique.includes(5)) return true;
+  return false;
+}
+</script>
+
 </body>
 </html>
