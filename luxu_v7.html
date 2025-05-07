@@ -262,5 +262,66 @@ target.innerHTML = `<img src="svg-cards/${fileName}" height="100%">`;
 </script>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+function saveAllCards() {
+  const slots = document.querySelectorAll('.card-slot, .player-card');
+  const cardData = {};
+  slots.forEach(slot => {
+    const id = slot.id;
+    const img = slot.querySelector('img');
+    if (img) {
+      const src = img.getAttribute('src');
+      cardData[id] = src;
+    }
+  });
+  localStorage.setItem('savedCards', JSON.stringify(cardData));
+}
+
+function loadAllCards() {
+  const data = localStorage.getItem('savedCards');
+  if (!data) return;
+  const cardData = JSON.parse(data);
+  Object.entries(cardData).forEach(([id, src]) => {
+    const slot = document.getElementById(id);
+    if (slot) {
+      slot.innerHTML = `<img src="${src}" height="100%">`;
+      const fileName = src.split("/").pop().replace(".svg", "");
+      const parts = fileName.split("_of_");
+      if (parts.length === 2) {
+        const shortCode = parts[0].replace('jack', 'J').replace('queen', 'Q').replace('king', 'K').replace('ace', 'A') + parts[1][0];
+        usedCards.add(shortCode);
+      }
+    }
+  });
+}
+
+function clearAllCards() {
+  if (!confirm("คุณต้องการล้างข้อมูลทั้งหมดใช่หรือไม่?")) return;
+  localStorage.removeItem('savedCards');
+  usedCards.clear();
+  const slots = document.querySelectorAll('.card-slot, .player-card');
+  slots.forEach(slot => {
+    slot.innerHTML = "";
+  });
+}
+
+document.querySelectorAll('.card-slot, .player-card').forEach(slot => {
+  slot.addEventListener('click', () => {
+    setTimeout(saveAllCards, 100); // เลือกไพ่แล้วค่อยบันทึก
+  });
+});
+
+window.onload = () => {
+  loadAllCards();
+  const allCardSlots = document.querySelectorAll('.card-slot, .player-card');
+  allCardSlots.forEach(slot => {
+    slot.addEventListener('click', () => {
+      openCardPicker(slot.id);
+    });
+  });
+}
+</script>
+
 </body>
 </html>
