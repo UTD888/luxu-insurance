@@ -223,9 +223,54 @@
 <div class="popup-row" id="cardOptions"></div>
 </div>
 </div>
+
 <script>
+let usedCards = new Set();
 let maxHands = 9;
 let minHands = 2;
+
+function getCardKey(rank, suit) {
+  return `${rank}_of_${suit}`;
+}
+
+function openCardPicker(slot) {
+  currentSlot = slot;
+  document.getElementById("cardPicker").style.display = "flex";
+  showTab('spades');
+}
+
+function closePopup() {
+  document.getElementById("cardPicker").style.display = "none";
+}
+
+function showTab(suit) {
+  const row = document.getElementById("cardOptions");
+  row.innerHTML = '';
+  for (let rank of allRanks) {
+    const key = getCardKey(rank, suit);
+    if (usedCards.has(key)) continue;
+    const img = document.createElement('img');
+    img.src = `svg-cards/${key}.svg`;
+    img.alt = key;
+    img.onclick = () => {
+      if (currentSlot.dataset.cardKey) {
+        usedCards.delete(currentSlot.dataset.cardKey);
+      }
+      currentSlot.style.backgroundImage = `url('svg-cards/${key}.svg')`;
+      currentSlot.textContent = '';
+      currentSlot.dataset.cardKey = key;
+      usedCards.add(key);
+      closePopup();
+    };
+    row.appendChild(img);
+  }
+}
+
+function bindCardSlots() {
+  document.querySelectorAll(".card-slot").forEach(slot => {
+    slot.onclick = () => openCardPicker(slot);
+  });
+}
 
 function addHand() {
   const container = document.querySelector(".players-grid");
@@ -260,15 +305,12 @@ function removeHand() {
   container.removeChild(lastBox);
 }
 
-function bindCardSlots() {
-  document.querySelectorAll(".card-slot").forEach(slot => {
-    slot.onclick = () => openCardPicker(slot);
-  });
-}
+const allRanks = ['2','3','4','5','6','7','8','9','10','jack','queen','king','ace'];
+const allSuits = ['spades','hearts','diamonds','clubs'];
+let currentSlot = null;
 
 window.onload = () => {
   bindCardSlots();
 };
-</script>
-</body>
+</script></body>
 </html>
