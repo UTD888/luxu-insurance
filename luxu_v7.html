@@ -762,6 +762,12 @@ function saveState() {
 }
 
 function loadState() {
+  setTimeout(() => {
+    if (typeof evaluateHandsAndOuts === 'function') {
+      evaluateHandsAndOuts();
+    }
+  }, 200);
+
   const boardData = JSON.parse(localStorage.getItem('luxu_board') || '[]');
   boardData.forEach((card, idx) => {
     const slot = document.querySelectorAll('#board .card-slot')[idx];
@@ -885,6 +891,12 @@ document.addEventListener("DOMContentLoaded", function() {
 });
 
 function loadState() {
+  setTimeout(() => {
+    if (typeof evaluateHandsAndOuts === 'function') {
+      evaluateHandsAndOuts();
+    }
+  }, 200);
+
   const boardData = JSON.parse(localStorage.getItem('luxu_board') || '[]');
   boardData.forEach((card, idx) => {
     const slot = document.querySelectorAll('#board .card-slot')[idx];
@@ -928,6 +940,12 @@ document.addEventListener("DOMContentLoaded", function() {
 });
 
 function loadState() {
+  setTimeout(() => {
+    if (typeof evaluateHandsAndOuts === 'function') {
+      evaluateHandsAndOuts();
+    }
+  }, 200);
+
   const boardData = JSON.parse(localStorage.getItem('luxu_board') || '[]');
   boardData.forEach((card, idx) => {
     const slot = document.querySelectorAll('#board .card-slot')[idx];
