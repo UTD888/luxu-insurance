@@ -290,7 +290,6 @@
 <strong>Rate:</strong> <span id="rateResult">-</span>
 </div>
 </div>
-
 <h1>Luxu Insurance</h1>
 <div class="section-title">Board: Flop + Turn</div>
 <div class="board-grid">
@@ -481,6 +480,87 @@ window.onload = () => {
   bindCardSlots();
   loadAllCards();
 };
+
+
+function getRateFromOuts(outs) {
+  const rateTable = {
+    1: 30,
+    2: 15,
+    3: 10,
+    4: 8,
+    5: 6,
+    6: 5,
+    7: 4,
+    8: 3.5,
+    9: 3,
+    10: 2.5,
+    11: 2.2,
+    12: 2,
+    13: 1.8,
+    14: 1.6
+  };
+  return rateTable[outs] || "-";
+}
+
+function getAllUsedCards() {
+  const used = [];
+  document.querySelectorAll('.card-slot').forEach(slot => {
+    const cardKey = slot.dataset.cardKey;
+    if (cardKey) used.push(cardKey);
+  });
+  return used;
+}
+
+function getRemainingDeck(usedCards) {
+  const suits = ['spades', 'hearts', 'diamonds', 'clubs'];
+  const ranks = ['2','3','4','5','6','7','8','9','10','jack','queen','king','ace'];
+  const fullDeck = [];
+  suits.forEach(suit => {
+    ranks.forEach(rank => {
+      fullDeck.push(`${rank}_of_${suit}`);
+    });
+  });
+  return fullDeck.filter(card => !usedCards.includes(card));
+}
+
+function calculateOutsAndRate() {
+  const used = getAllUsedCards();
+  if (used.length < 3 + (2 * 2)) return; // ต้องมี Flop 3 ใบ + ผู้เล่นอย่างน้อย 2 คน
+
+  const board = used.slice(0, 4); // Flop + optional Turn
+  const playerCards = [];
+  const playerBoxes = document.querySelectorAll('.player-box');
+  playerBoxes.forEach(box => {
+    const cards = box.querySelectorAll('.card-slot');
+    if (cards.length >= 2 &&
+        cards[0].dataset.cardKey && cards[1].dataset.cardKey) {
+      playerCards.push([cards[0].dataset.cardKey, cards[1].dataset.cardKey]);
+    }
+  });
+
+  if (playerCards.length < 2) return;
+
+  const mode = board.length === 3 ? 'turn' : 'river';
+  const deck = getRemainingDeck(used);
+  let outs = 0;
+
+  deck.forEach(testCard => {
+    const testBoard = [...board, testCard];
+    const hands = playerCards.map(p => [...p, ...testBoard].join(","));
+    // ใช้ string เปรียบเทียบจำลอง — ในอนาคตควรแทนด้วย hand ranking จริง
+    const winner = hands.indexOf([...hands].sort().reverse()[0]);
+    if (winner !== 0) outs++;
+  });
+
+  document.getElementById("outsResult").innerText = outs;
+  document.getElementById("rateResult").innerText = getRateFromOuts(outs);
+}
+
+document.querySelectorAll(".card-slot").forEach(slot => {
+  slot.addEventListener("click", () => {
+    setTimeout(() => calculateOutsAndRate(), 200);
+  });
+});
 </script>
 <div class="popup" id="cardPicker">
 <div class="popup-inner">
