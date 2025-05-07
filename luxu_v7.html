@@ -206,7 +206,11 @@
         if (!usedCards.has(cardCode)) {
           const btn = document.createElement('button');
           btn.className = 'btn btn-outline-light btn-sm';
-          btn.innerHTML = `<img src="svg-cards/${cardCode}.svg" height="50">`;
+          const rank = cardCode.slice(0, -1);
+const suit = cardCode.slice(-1);
+const suitName = { d: 'diamonds', c: 'clubs', h: 'hearts', s: 'spades' }[suit];
+const fileName = `${rank}_of_${suitName}.svg`;
+btn.innerHTML = `<img src="svg-cards/${fileName}" height="50">`;
           btn.onclick = () => selectCard(cardCode);
           container.appendChild(btn);
         }
@@ -228,7 +232,11 @@
   function selectCard(cardCode) {
     if (currentTargetId) {
       const target = document.getElementById(currentTargetId);
-      target.innerHTML = `<img src="svg-cards/${cardCode}.svg" height="100%">`;
+      const rank = cardCode.slice(0, -1);
+const suit = cardCode.slice(-1);
+const suitName = { d: 'diamonds', c: 'clubs', h: 'hearts', s: 'spades' }[suit];
+const fileName = `${rank}_of_${suitName}.svg`;
+target.innerHTML = `<img src="svg-cards/${fileName}" height="100%">`;
       usedCards.add(cardCode);
       closeCardPicker();
     }
