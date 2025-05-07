@@ -802,5 +802,25 @@ function clearState() {
 }
 </script>
 
+
+<script>
+function confirmReset() {
+  if (confirm("คุณแน่ใจหรือไม่ว่าต้องการรีเซตทั้งหมด?")) {
+    localStorage.clear();
+    location.reload();
+  }
+}
+</script>
+
+<script>
+function confirmReset() {
+  if (confirm("คุณแน่ใจหรือไม่ว่าต้องการรีเซตทั้งหมด?")) {
+    localStorage.clear();
+    const outBox = document.querySelector('.outs-box');
+    if (outBox) outBox.innerHTML = '<h3>Outs / Rate</h3><p>ยังไม่มีข้อมูล</p>';
+    location.reload();
+  }
+}
+</script>
 </body>
 </html>
