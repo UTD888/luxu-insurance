@@ -253,6 +253,12 @@ target.innerHTML = `<img src="svg-cards/${fileName}" height="100%">`;
 
   // เพิ่ม listener ให้ทุกช่องกริด
   window.onload = () => {
+  // ให้ card-slot (board) ใช้ openCardPicker ได้
+  document.querySelectorAll('.card-slot').forEach(slot => {
+    slot.addEventListener('click', () => {
+      openCardPicker(slot.id);
+    });
+  });
     const allCardSlots = document.querySelectorAll('.card-slot, .player-card');
     allCardSlots.forEach(slot => {
       slot.addEventListener('click', () => {
@@ -314,6 +320,12 @@ document.querySelectorAll('.card-slot, .player-card').forEach(slot => {
 });
 
 window.onload = () => {
+  // ให้ card-slot (board) ใช้ openCardPicker ได้
+  document.querySelectorAll('.card-slot').forEach(slot => {
+    slot.addEventListener('click', () => {
+      openCardPicker(slot.id);
+    });
+  });
   loadAllCards();
   const allCardSlots = document.querySelectorAll('.card-slot, .player-card');
   allCardSlots.forEach(slot => {
@@ -395,6 +407,12 @@ function loadPlayerCount() {
 }
 
 window.onload = () => {
+  // ให้ card-slot (board) ใช้ openCardPicker ได้
+  document.querySelectorAll('.card-slot').forEach(slot => {
+    slot.addEventListener('click', () => {
+      openCardPicker(slot.id);
+    });
+  });
   loadPlayerCount();
   renderPlayers();
 };
