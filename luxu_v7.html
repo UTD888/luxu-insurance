@@ -100,7 +100,7 @@
     }
   </style>
 </head>
-<body onload="loadState()">
+<body>
 
   <h1>LUXU POKER INSURANCE</h1>
 
@@ -875,6 +875,49 @@ function confirmReset() {
 
     // Delay 200ms to ensure DOM cleared before reload
     setTimeout(() => location.reload(), 200);
+  }
+}
+</script>
+
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+  loadState();
+});
+
+function loadState() {
+  const boardData = JSON.parse(localStorage.getItem('luxu_board') || '[]');
+  boardData.forEach((card, idx) => {
+    const slot = document.querySelectorAll('#board .card-slot')[idx];
+    if (card && slot) {
+      const img = document.createElement('img');
+      img.src = `svg-cards/${card}.svg`;
+      img.setAttribute('data-card', card);
+      slot.innerHTML = '';
+      slot.appendChild(img);
+    }
+  });
+
+  const playersData = JSON.parse(localStorage.getItem('luxu_players') || '[]');
+  const playerBoxes = document.querySelectorAll('.player-box');
+  playersData.forEach((cards, pIdx) => {
+    const box = playerBoxes[pIdx];
+    if (!box) return;
+    const slots = box.querySelectorAll('.player-card');
+    cards.forEach((card, cIdx) => {
+      if (card) {
+        const img = document.createElement('img');
+        img.src = `svg-cards/${card}.svg`;
+        img.setAttribute('data-card', card);
+        slots[cIdx].innerHTML = '';
+        slots[cIdx].appendChild(img);
+      }
+    });
+  });
+
+  const resultBox = document.querySelector('.outs-box');
+  if (resultBox) {
+    const result = localStorage.getItem('luxu_result');
+    resultBox.innerHTML = result ? result : '<h3>Outs / Rate</h3><p>ยังไม่มีข้อมูล</p>';
   }
 }
 </script>
