@@ -105,7 +105,7 @@
   <h1>LUXU POKER INSURANCE</h1>
 
   <div class="reset-container">
-    <button class="btn btn-danger btn-sm">
+    <button class="btn btn-danger btn-sm" onclick="clearAllCards()">
       <i class="bi bi-arrow-clockwise"></i> Reset
     </button>
   </div>
@@ -246,6 +246,7 @@ const suitName = { d: 'diamonds', c: 'clubs', h: 'hearts', s: 'spades' }[suit];
 const fileName = `${rank}_of_${suitName}.svg`;
 target.innerHTML = `<img src="svg-cards/${fileName}" height="100%">`;
       usedCards.add(cardCode);
+      saveAllCards();
       closeCardPicker();
     }
   }
