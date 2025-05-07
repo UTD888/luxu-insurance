@@ -40,10 +40,6 @@
       align-items: center;
       gap: 8px;
       box-shadow: 0 2px 10px rgba(255, 0, 0, 0.4);
-      transition: background-color 0.2s ease;
-    }
-    .reset-button:hover {
-      background-color: #e74c3c;
     }
     .board {
       display: grid;
@@ -54,26 +50,25 @@
     .card-slot {
       width: 84px;
       height: 126px;
-      border: 2px dashed #f5d76e;
       background-color: #1a1a1a;
+      border: 2px dashed #f5d76e;
       display: flex;
       align-items: center;
       justify-content: center;
-      position: relative;
-      box-shadow: 0 0 8px rgba(255, 215, 0, 0.3);
+      background-size: cover;
+      background-position: center;
       border-radius: 6px;
+      cursor: pointer;
     }
     .card-slot:nth-child(-n+3)::before {
       content: "Flop";
       position: absolute;
-      top: -20px;
       font-size: 12px;
       color: #ccc;
     }
     .card-slot:nth-child(4)::before {
       content: "Turn";
       position: absolute;
-      top: -20px;
       font-size: 12px;
       color: #ccc;
     }
@@ -90,16 +85,16 @@
       justify-content: center;
       gap: 15px;
     }
-    .player input {
+    .card-input {
       width: 75px;
       height: 105px;
-      text-align: center;
-      border: 2px solid #ffd700;
       background-color: #1c1c1c;
-      color: white;
-      font-size: 22px;
+      border: 2px solid #ffd700;
+      background-size: cover;
+      background-position: center;
       border-radius: 5px;
       box-shadow: 0 0 6px rgba(255, 215, 0, 0.3);
+      cursor: pointer;
     }
     .controls {
       margin-bottom: 25px;
@@ -112,10 +107,6 @@
       border: 1px solid #777;
       border-radius: 5px;
       cursor: pointer;
-      box-shadow: 0 2px 6px rgba(255, 215, 0, 0.2);
-    }
-    .controls button:hover {
-      background-color: #444;
     }
     .result-box {
       border: 2px solid #ffd700;
@@ -135,40 +126,91 @@
       margin: 5px 0;
       font-size: 18px;
     }
-    .highlight {
-      font-weight: bold;
-      font-size: 20px;
-      color: #ffffff;
+
+    /* Popup */
+    .card-popup {
+      display: none;
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background-color: rgba(0, 0, 0, 0.85);
+      z-index: 999;
+      align-items: center;
+      justify-content: center;
+    }
+    .popup-content {
+      background-color: #222;
+      padding: 20px;
+      border-radius: 10px;
+      width: 90%;
+      max-width: 600px;
+      color: white;
+    }
+    .popup-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+    .popup-tabs {
+      display: flex;
+      justify-content: center;
+      margin-bottom: 10px;
+    }
+    .popup-tabs button {
+      background-color: #333;
+      border: none;
+      color: #f5d76e;
+      padding: 8px 16px;
+      margin: 0 5px;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+    .popup-tabs .red {
+      color: #ff5e5e;
+    }
+    .popup-tabs .black {
+      color: #ddd;
+    }
+    .popup-grid {
+      display: grid;
+      grid-template-columns: repeat(13, 1fr);
+      gap: 6px;
+      justify-items: center;
+    }
+    .popup-grid img {
+      width: 40px;
+      height: auto;
+      cursor: pointer;
     }
   </style>
 </head>
 <body>
   <h1>Luxu Insurance</h1>
   <div class="reset-button-container">
-    <button class="reset-button">🔄 Reset All</button>
+    <button class="reset-button" onclick="location.reload()">🔄 Reset All</button>
   </div>
 
   <div class="board">
-    <div class="card-slot"></div>
-    <div class="card-slot"></div>
-    <div class="card-slot"></div>
-    <div class="card-slot"></div>
+    <div class="card-slot" data-slot="0"></div>
+    <div class="card-slot" data-slot="1"></div>
+    <div class="card-slot" data-slot="2"></div>
+    <div class="card-slot" data-slot="3"></div>
   </div>
 
-  <div class="players-container">
+  <div class="players-container" id="playersContainer">
     <div class="player">
-      <input type="text" placeholder="?" />
-      <input type="text" placeholder="?" />
+      <div class="card-input"></div>
+      <div class="card-input"></div>
     </div>
     <div class="player">
-      <input type="text" placeholder="?" />
-      <input type="text" placeholder="?" />
+      <div class="card-input"></div>
+      <div class="card-input"></div>
     </div>
   </div>
 
   <div class="controls">
-    <button>+ Hand</button>
-    <button>- Hand</button>
+    <button onclick="addPlayer()">+ Hand</button>
+    <button onclick="removePlayer()">- Hand</button>
   </div>
 
   <div class="result-box">
@@ -177,117 +219,21 @@
     <p>Rate: <span class="highlight">-</span></p>
   </div>
 
-  <script>
-    const playersContainer = document.querySelector('.players-container');
-    const addBtn = document.querySelector('.controls button:nth-child(1)');
-    const removeBtn = document.querySelector('.controls button:nth-child(2)');
-
-    let playerCount = 2;
-
-    function createPlayer(index) {
-      const wrapper = document.createElement('div');
-      wrapper.className = 'player';
-      wrapper.innerHTML = `
-        <input type="text" placeholder="?" />
-        <input type="text" placeholder="?" />
-      `;
-      return wrapper;
-    }
-
-    addBtn.addEventListener('click', () => {
-      if (playerCount < 9) {
-        const newPlayer = createPlayer(playerCount + 1);
-        playersContainer.appendChild(newPlayer);
-        playerCount++;
-        attachCardPopupEvents();
-      }
-    });
-
-    removeBtn.addEventListener('click', () => {
-      if (playerCount > 2) {
-        playersContainer.removeChild(playersContainer.lastElementChild);
-        playerCount--;
-      }
-    });
-  </script>
-
-<!-- Card Selection Popup -->
-<style>
-  .card-popup {
-    display: none;
-    position: fixed;
-    top: 0; left: 0; right: 0; bottom: 0;
-    background-color: rgba(0, 0, 0, 0.85);
-    z-index: 999;
-    align-items: center;
-    justify-content: center;
-  }
-  .popup-content {
-    background-color: #222;
-    padding: 20px;
-    border-radius: 10px;
-    width: 90%;
-    max-width: 600px;
-    color: white;
-  }
-  .popup-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 10px;
-  }
-  .popup-tabs {
-    display: flex;
-    justify-content: center;
-    margin-bottom: 10px;
-  }
-  .popup-tabs button {
-    background-color: #333;
-    border: none;
-    color: #f5d76e;
-    padding: 8px 16px;
-    margin: 0 5px;
-    border-radius: 6px;
-    cursor: pointer;
-  }
-  .popup-tabs .red {
-    color: #ff5e5e;
-  }
-  .popup-tabs .black {
-    color: #ddd;
-  }
-  .popup-grid {
-    display: grid;
-    grid-template-columns: repeat(13, 1fr);
-    gap: 6px;
-    justify-items: center;
-  }
-  .popup-grid img {
-    width: 40px;
-    height: auto;
-    cursor: pointer;
-    transition: transform 0.2s;
-  }
-  .popup-grid img:hover {
-    transform: scale(1.2);
-  }
-</style>
-
-<div class="card-popup" id="cardPopup">
-  <div class="popup-content">
-    <div class="popup-header">
-      <strong>Select a Card</strong>
-      <button onclick="closeCardPopup()" style="color:red; background:none; border:none; font-size:20px;">✖</button>
+  <div class="card-popup" id="cardPopup">
+    <div class="popup-content">
+      <div class="popup-header">
+        <strong>Select a Card</strong>
+        <button onclick="closeCardPopup()" style="color:red; background:none; border:none; font-size:20px;">✖</button>
+      </div>
+      <div class="popup-tabs">
+        <button class="black" onclick="showSuit('spades')">♠ Spades</button>
+        <button class="black" onclick="showSuit('clubs')">♣ Clubs</button>
+        <button class="red" onclick="showSuit('hearts')">♥ Hearts</button>
+        <button class="red" onclick="showSuit('diamonds')">♦ Diamonds</button>
+      </div>
+      <div class="popup-grid" id="popupGrid"></div>
     </div>
-    <div class="popup-tabs">
-      <button class="black" onclick="showSuit('spades')">♠ Spades</button>
-      <button class="black" onclick="showSuit('clubs')">♣ Clubs</button>
-      <button class="red" onclick="showSuit('hearts')">♥ Hearts</button>
-      <button class="red" onclick="showSuit('diamonds')">♦ Diamonds</button>
-    </div>
-    <div class="popup-grid" id="popupGrid"></div>
   </div>
-</div>
 
 <script>
   const suits = {
@@ -296,15 +242,14 @@
     hearts: 'h',
     diamonds: 'd'
   };
-
   const values = ['a','2','3','4','5','6','7','8','9','10','j','q','k'];
   const svgPath = 'svg-cards/';
   let activeInput = null;
 
-  function openCardPopup(inputElem) {
-    activeInput = inputElem;
+  function openCardPopup(elem) {
+    activeInput = elem;
     document.getElementById('cardPopup').style.display = 'flex';
-    showSuit('spades'); // default tab
+    showSuit('spades');
   }
 
   function closeCardPopup() {
@@ -312,7 +257,6 @@
   }
 
   function showSuit(suitName) {
-    const short = suits[suitName];
     const grid = document.getElementById('popupGrid');
     grid.innerHTML = '';
     values.forEach(value => {
@@ -320,32 +264,41 @@
       img.src = `${svgPath}${value}_of_${suitName}.svg`;
       img.alt = `${value} of ${suitName}`;
       img.onclick = () => {
-        if (activeInput) activeInput.value = value.toUpperCase() + short;
+        const path = `${svgPath}${value}_of_${suitName}.svg`;
+        if (activeInput) {
+          activeInput.style.backgroundImage = `url('${path}')`;
+          activeInput.setAttribute('data-card', `${value}_${suitName}`);
+        }
         closeCardPopup();
       };
       grid.appendChild(img);
     });
   }
 
-  // Attach click event to all card inputs dynamically
-  function attachCardPopupEvents() {
-      document.querySelectorAll('.player input, .board .card-slot').forEach(elem => {
-        elem.addEventListener('click', () => {
-          openCardPopup(elem);
-        });
-      });
-    }
-
-    document.addEventListener('DOMContentLoaded', () => {
-      attachCardPopupEvents();
-    document.querySelectorAll('.player input, .board .card-slot').forEach(elem => {
-      elem.addEventListener('click', () => {
-        openCardPopup(elem);
-      });
+  function attachCardEvents() {
+    document.querySelectorAll('.card-slot, .card-input').forEach(elem => {
+      elem.onclick = () => openCardPopup(elem);
     });
-  });
+  }
+
+  function addPlayer() {
+    const container = document.getElementById('playersContainer');
+    if (container.children.length >= 9) return;
+    const div = document.createElement('div');
+    div.className = 'player';
+    div.innerHTML = '<div class="card-input"></div><div class="card-input"></div>';
+    container.appendChild(div);
+    attachCardEvents();
+  }
+
+  function removePlayer() {
+    const container = document.getElementById('playersContainer');
+    if (container.children.length > 2) {
+      container.removeChild(container.lastElementChild);
+    }
+  }
+
+  document.addEventListener('DOMContentLoaded', attachCardEvents);
 </script>
-
 </body>
-
 </html>
