@@ -1,0 +1,1012 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>LUXU POKER INSURANCE</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet" />
+  <style>
+    body {
+      background-color: #1e1e1e;
+      color: #ffffff;
+      font-family: 'Segoe UI', sans-serif;
+      padding: 20px;
+    }
+    h1 {
+      text-align: center;
+      font-weight: 700;
+      color: #f5c518;
+      margin-bottom: 10px;
+    }
+    .card-slot {
+      width: 84px;
+      height: 126px;
+      border: 2px dashed #555;
+      background-color: #2c2c2c;
+      background-image: url('luxulogo.png');
+      background-repeat: no-repeat;
+      background-size: 80%;
+      background-position: center;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+      margin: 4px;
+      cursor: pointer;
+    }
+    .player-card { width: 68px; height: 101px;
+      width: 68px;   /* +40% from 60px */
+      height: 101px; /* +40% from 90px */
+      border: 2px dashed #555;
+      background-color: #2c2c2c;
+      background-image: url('luxulogo.png');
+      background-repeat: no-repeat;
+      background-size: 80%;
+      background-position: center;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+      margin: 4px;
+      cursor: pointer;
+    }
+    .card-slot.active, .player-card.active {
+      border: 2px solid #0d6efd;
+    }
+    .player-box {
+      background-color: transparent;
+      padding: 0;
+      border-radius: 0;
+      text-align: center;
+      background-color: #2b2b2b;
+      padding: 8px;
+      border-radius: 10px;
+      text-align: center;
+      width: auto;
+    }
+    .player-row {
+      display: flex;
+      justify-content: center;
+      gap: 20px;
+      flex-wrap: wrap;
+      margin-bottom: 15px;
+    }
+    .player-card-row {
+      display: flex;
+      justify-content: center;
+      gap: 8px;
+    }
+    .controls {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      margin-top: 10px;
+    }
+    .btn-icon {
+      min-width: 140px;
+    }
+    .outs-box {
+      background-color: #333;
+      padding: 15px;
+      border-radius: 10px;
+      margin-top: 30px;
+    }
+    .reset-container {
+      display: flex;
+      justify-content: center;
+      margin-bottom: 15px;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>LUXU POKER INSURANCE</h1>
+
+  <div class="reset-container">
+    <button class="btn btn-danger btn-sm" onclick="clearAllCards()">
+      <i class="bi bi-arrow-clockwise"></i> Reset
+    </button>
+  </div>
+
+  <div class="text-center mb-4">
+    <div class="d-flex justify-content-center flex-wrap">
+      <div class="card-slot" id="board1"></div>
+      <div class="card-slot" id="board2"></div>
+      <div class="card-slot" id="board3"></div>
+      <div class="card-slot" id="board4"></div>
+    </div>
+  </div>
+
+  <div id="player-area" class="text-center">
+    <div class="player-row">
+      <div class="player-box">
+        <div><strong>P1</strong></div>
+        <div class="player-card-row">
+          <div class="player-card" id="p1c1"></div>
+          <div class="player-card" id="p1c2"></div>
+        </div>
+      </div>
+      <div class="player-box">
+        <div><strong>P2</strong></div>
+        <div class="player-card-row">
+          <div class="player-card" id="p2c1"></div>
+          <div class="player-card" id="p2c2"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="controls">
+    <button class="btn btn-success btn-icon" id="add-player">
+      <i class="bi bi-person-plus-fill"></i> เพิ่มผู้เล่น
+    </button>
+    <button class="btn btn-warning btn-icon" id="remove-player">
+      <i class="bi bi-person-dash-fill"></i> ลบผู้เล่น
+    </button>
+  </div>
+
+  <div class="outs-box text-center">
+    <h5>Outs / Rate</h5>
+    <div id="outs-result" style="white-space: pre-line;">ยังไม่มีข้อมูล</div>
+  </div>
+
+
+<!-- Popup Card Picker -->
+<div id="cardPickerPopup" class="position-fixed top-0 start-0 w-100 h-100 d-none" style="background-color: rgba(0,0,0,0.8); z-index: 1050;">
+  <div class="position-absolute top-50 start-50 translate-middle bg-dark rounded p-3 text-white" style="width: 95%; max-width: 400px;">
+    <div class="d-flex justify-content-between align-items-center mb-2">
+      <h5 class="mb-0">เลือกไพ่</h5>
+      <button class="btn btn-sm btn-light" onclick="closeCardPicker()">X</button>
+    </div>
+    <ul class="nav nav-tabs mb-3" id="suitTabs" role="tablist">
+      <li class="nav-item" role="presentation">
+        <button class="nav-link active text-danger" id="tab-diamond" data-bs-toggle="tab" data-bs-target="#cards-diamond" type="button">♦️</button>
+      </li>
+      <li class="nav-item" role="presentation">
+        <button class="nav-link text-dark" id="tab-club" data-bs-toggle="tab" data-bs-target="#cards-club" type="button">♣️</button>
+      </li>
+      <li class="nav-item" role="presentation">
+        <button class="nav-link text-danger" id="tab-heart" data-bs-toggle="tab" data-bs-target="#cards-heart" type="button">♥️</button>
+      </li>
+      <li class="nav-item" role="presentation">
+        <button class="nav-link text-dark" id="tab-spade" data-bs-toggle="tab" data-bs-target="#cards-spade" type="button">♠️</button>
+      </li>
+    </ul>
+    <div class="tab-content">
+      <div class="tab-pane fade show active" id="cards-diamond" role="tabpanel">
+        <div class="d-flex flex-wrap gap-2 justify-content-center" id="suit-d"></div>
+      </div>
+      <div class="tab-pane fade" id="cards-club" role="tabpanel">
+        <div class="d-flex flex-wrap gap-2 justify-content-center" id="suit-c"></div>
+      </div>
+      <div class="tab-pane fade" id="cards-heart" role="tabpanel">
+        <div class="d-flex flex-wrap gap-2 justify-content-center" id="suit-h"></div>
+      </div>
+      <div class="tab-pane fade" id="cards-spade" role="tabpanel">
+        <div class="d-flex flex-wrap gap-2 justify-content-center" id="suit-s"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  const allSuits = ['d', 'c', 'h', 's'];
+  const allRanks = ['2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K', 'A'];
+  const usedCards = new Set();
+  let currentTargetId = null;
+
+  function createCardButtons() {
+    allSuits.forEach(suit => {
+      const container = document.getElementById('suit-' + suit);
+      container.innerHTML = '';
+      allRanks.forEach(rank => {
+        const cardCode = rank + suit;
+        if (!usedCards.has(cardCode)) {
+          const btn = document.createElement('button');
+          btn.className = 'btn btn-outline-light btn-sm';
+          let rank = cardCode.slice(0, -1);
+if (rank === 'J') rank = 'jack';
+else if (rank === 'Q') rank = 'queen';
+else if (rank === 'K') rank = 'king';
+else if (rank === 'A') rank = 'ace';
+const suit = cardCode.slice(-1);
+const suitName = { d: 'diamonds', c: 'clubs', h: 'hearts', s: 'spades' }[suit];
+let trueRank = rank;
+if (rank === 'J') trueRank = 'jack';
+else if (rank === 'Q') trueRank = 'queen';
+else if (rank === 'K') trueRank = 'king';
+else if (rank === 'A') trueRank = 'ace';
+const fileName = `${trueRank}_of_${suitName}.svg`;
+btn.innerHTML = `<img src="svg-cards/${fileName}" height="50">`;
+          btn.onclick = () => selectCard(cardCode);
+          container.appendChild(btn);
+        }
+      });
+    });
+  }
+
+  function openCardPicker(targetId) {
+    currentTargetId = targetId;
+    createCardButtons();
+    document.getElementById('cardPickerPopup').classList.remove('d-none');
+  }
+
+  function closeCardPicker() {
+    document.getElementById('cardPickerPopup').classList.add('d-none');
+    currentTargetId = null;
+  }
+
+  function selectCard(cardCode) {
+    if (currentTargetId) {
+      const target = document.getElementById(currentTargetId);
+      let rank = cardCode.slice(0, -1);
+if (rank === 'J') rank = 'jack';
+else if (rank === 'Q') rank = 'queen';
+else if (rank === 'K') rank = 'king';
+else if (rank === 'A') rank = 'ace';
+const suit = cardCode.slice(-1);
+const suitName = { d: 'diamonds', c: 'clubs', h: 'hearts', s: 'spades' }[suit];
+let trueRank = rank;
+if (rank === 'J') trueRank = 'jack';
+else if (rank === 'Q') trueRank = 'queen';
+else if (rank === 'K') trueRank = 'king';
+else if (rank === 'A') trueRank = 'ace';
+const fileName = `${trueRank}_of_${suitName}.svg`;
+target.innerHTML = `<img src="svg-cards/${fileName}" height="100%">`;
+      usedCards.add(cardCode);
+      saveAllCards();
+      closeCardPicker();
+    }
+  }
+
+  // เพิ่ม listener ให้ทุกช่องกริด
+  window.onload = () => {
+  // ให้ card-slot (board) ใช้ openCardPicker ได้
+  document.querySelectorAll('.card-slot').forEach(slot => {
+    slot.addEventListener('click', () => {
+      openCardPicker(slot.id);
+    });
+  });
+    const allCardSlots = document.querySelectorAll('.card-slot, .player-card');
+    allCardSlots.forEach(slot => {
+      slot.addEventListener('click', () => {
+        openCardPicker(slot.id);
+      });
+    });
+  };
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+function saveAllCards() {
+  const slots = document.querySelectorAll('.card-slot, .player-card');
+  const cardData = {};
+  slots.forEach(slot => {
+    const id = slot.id;
+    const img = slot.querySelector('img');
+    if (img) {
+      const src = img.getAttribute('src');
+      cardData[id] = src;
+    }
+  });
+  localStorage.setItem('savedCards', JSON.stringify(cardData));
+}
+
+function loadAllCards() {
+  const data = localStorage.getItem('savedCards');
+  if (!data) return;
+  const cardData = JSON.parse(data);
+  Object.entries(cardData).forEach(([id, src]) => {
+    const slot = document.getElementById(id);
+    if (slot) {
+      slot.innerHTML = `<img src="${src}" height="100%">`;
+      const fileName = src.split("/").pop().replace(".svg", "");
+      const parts = fileName.split("_of_");
+      if (parts.length === 2) {
+        const shortCode = parts[0].replace('jack', 'J').replace('queen', 'Q').replace('king', 'K').replace('ace', 'A') + parts[1][0];
+        usedCards.add(shortCode);
+      }
+    }
+  });
+}
+
+function clearAllCards() {
+  if (!confirm("คุณต้องการล้างข้อมูลทั้งหมดใช่หรือไม่?")) return;
+  localStorage.removeItem('savedCards');
+  usedCards.clear();
+  const slots = document.querySelectorAll('.card-slot, .player-card');
+  slots.forEach(slot => {
+    slot.innerHTML = "";
+  });
+}
+
+document.querySelectorAll('.card-slot, .player-card').forEach(slot => {
+  slot.addEventListener('click', () => {
+    setTimeout(saveAllCards, 100); // เลือกไพ่แล้วค่อยบันทึก
+  });
+});
+
+window.onload = () => {
+  // ให้ card-slot (board) ใช้ openCardPicker ได้
+  document.querySelectorAll('.card-slot').forEach(slot => {
+    slot.addEventListener('click', () => {
+      openCardPicker(slot.id);
+    });
+  });
+  loadAllCards();
+  const allCardSlots = document.querySelectorAll('.card-slot, .player-card');
+  allCardSlots.forEach(slot => {
+    slot.addEventListener('click', () => {
+      openCardPicker(slot.id);
+    });
+  });
+}
+</script>
+
+
+<script>
+let playerCount = 2;
+
+function renderPlayers() {
+  const container = document.getElementById('player-area');
+  container.innerHTML = '';
+  for (let i = 1; i <= playerCount; i += 2) {
+    const row = document.createElement('div');
+    row.className = 'player-row';
+
+    for (let j = i; j <= Math.min(i + 1, playerCount); j++) {
+      const box = document.createElement('div');
+      box.className = 'player-box';
+      box.innerHTML = `
+        <div><strong>P${j}</strong></div>
+        <div class="player-card-row">
+          <div class="player-card" id="p${j}c1"></div>
+          <div class="player-card" id="p${j}c2"></div>
+        </div>
+      `;
+      row.appendChild(box);
+    }
+
+    container.appendChild(row);
+  }
+
+  // add click listeners for all new cards
+  setTimeout(() => {
+    document.querySelectorAll('.player-card').forEach(slot => {
+      slot.addEventListener('click', () => {
+        openCardPicker(slot.id);
+      });
+    });
+    loadAllCards(); // reload values into new slots if needed
+  }, 10);
+}
+
+document.getElementById('add-player').addEventListener('click', () => {
+  if (playerCount >= 9) return;
+  playerCount++;
+  renderPlayers();
+  savePlayerCount();
+});
+
+document.getElementById('remove-player').addEventListener('click', () => {
+  if (playerCount <= 2) return;
+  // remove cards of last player from savedCards
+  const card1 = `p${playerCount}c1`;
+  const card2 = `p${playerCount}c2`;
+  const data = JSON.parse(localStorage.getItem('savedCards') || '{}');
+  delete data[card1];
+  delete data[card2];
+  localStorage.setItem('savedCards', JSON.stringify(data));
+  playerCount--;
+  renderPlayers();
+  savePlayerCount();
+});
+
+function savePlayerCount() {
+  localStorage.setItem('playerCount', playerCount);
+}
+
+function loadPlayerCount() {
+  const saved = localStorage.getItem('playerCount');
+  if (saved) {
+    playerCount = parseInt(saved);
+  }
+}
+
+window.onload = () => {
+  // ให้ card-slot (board) ใช้ openCardPicker ได้
+  document.querySelectorAll('.card-slot').forEach(slot => {
+    slot.addEventListener('click', () => {
+      openCardPicker(slot.id);
+    });
+  });
+  loadPlayerCount();
+  renderPlayers();
+};
+</script>
+
+
+<script>
+// เรียกใช้ทันทีเมื่อไพ่บน board >= 3 และ player >= 2 คน
+
+function evaluateHandsAndOuts()() { {
+  const board = [];
+  ['board1', 'board2', 'board3', 'board4'].forEach(id => {
+    const img = document.getElementById(id).querySelector('img');
+    if (img) {
+      const src = img.getAttribute('src');
+      const code = extractShortCodeFromSrc(src);
+      board.push(code);
+    }
+  });
+
+  if (board.length < 3) {
+    document.getElementById('outs-result').innerText = 'ใส่ไพ่ Flop อย่างน้อย 3 ใบก่อน';
+    return;
+  }
+
+  const players = [];
+  for (let i = 1; i <= playerCount; i++) {
+    const c1 = document.getElementById(`p${i}c1`).querySelector('img');
+    const c2 = document.getElementById(`p${i}c2`).querySelector('img');
+    if (c1 && c2) {
+      const card1 = extractShortCodeFromSrc(c1.getAttribute('src'));
+      const card2 = extractShortCodeFromSrc(c2.getAttribute('src'));
+      players.push({ id: `P${i}`, cards: [card1, card2] });
+    }
+  }
+
+  if (players.length < 2) {
+    document.getElementById('outs-result').innerText = 'ต้องมีผู้เล่นอย่างน้อย 2 คน';
+    return;
+  }
+
+  // จำลองการคำนวณ (mock): แสดงไพ่ที่มี, ยังไม่เปรียบเทียบ
+  let output = 'Board: ' + board.join(', ') + '\n';
+  players.forEach(p => {
+    output += `${p.id}: ${p.cards.join(', ')}\n`;
+  });
+
+  output += '\n(ระบบกำลังพัฒนา: ยังไม่ได้ประเมิน Hand และ Outs จริง)';
+
+  document.getElementById('outs-result').innerText = output;
+}
+
+// แปลงชื่อไฟล์ SVG → เป็นรหัสสั้นเช่น "Qh"
+function extractShortCodeFromSrc(src) {
+  const name = src.split("/").pop().replace(".svg", ""); // e.g. queen_of_hearts
+  const [rankRaw, suitRaw] = name.split("_of_");
+  const rank = { jack: 'J', queen: 'Q', king: 'K', ace: 'A' }[rankRaw] || rankRaw;
+  const suit = { hearts: 'h', diamonds: 'd', clubs: 'c', spades: 's' }[suitRaw];
+  return rank + suit;
+}
+
+// เรียก evaluate ทุกครั้งหลังเลือกไพ่
+function selectCard(cardCode) {
+  if (currentTargetId) {
+    const target = document.getElementById(currentTargetId);
+    const rank = cardCode.slice(0, -1);
+    const suit = cardCode.slice(-1);
+    const suitName = { d: 'diamonds', c: 'clubs', h: 'hearts', s: 'spades' }[suit];
+    let trueRank = rank;
+if (rank === 'J') trueRank = 'jack';
+else if (rank === 'Q') trueRank = 'queen';
+else if (rank === 'K') trueRank = 'king';
+else if (rank === 'A') trueRank = 'ace';
+const fileName = `${trueRank}_of_${suitName}.svg`;
+    target.innerHTML = `<img src="svg-cards/${fileName}" height="100%">`;
+    usedCards.add(cardCode);
+    saveAllCards();
+    closeCardPicker();
+    setTimeout(evaluateHandsAndOuts, 100); // เรียกคำนวณใหม่หลังใส่ไพ่
+  }
+}
+</script>
+
+
+<script>
+// ฟังก์ชันแปลงรหัสไพ่เป็นค่าตัวเลข
+const rankMap = { '2': 2, '3': 3, '4': 4, '5': 5, '6': 6, '7': 7,
+                  '8': 8, '9': 9, '10': 10, 'J': 11, 'Q': 12,
+                  'K': 13, 'A': 14 };
+
+// ประเมินแฮนด์ 5–7 ใบ → คืนค่าคะแนนและชื่อแฮนด์
+function evaluateHand(cards) {
+  let ranks = {}, suits = {}, values = [];
+
+  cards.forEach(card => {
+    const rank = card.slice(0, -1);
+    const suit = card.slice(-1);
+    const val = rankMap[rank];
+    ranks[rank] = (ranks[rank] || 0) + 1;
+    suits[suit] = (suits[suit] || 0) + 1;
+    values.push(val);
+  });
+
+  values.sort((a,b) => b-a);
+  const isFlush = Object.values(suits).some(c => c >= 5);
+  const isStraight = checkStraight(values);
+  const handCounts = Object.values(ranks).sort((a,b) => b-a).join('');
+
+  if (isFlush && isStraight && values.includes(14) && values.includes(10)) return { rank: 10, name: "Royal Flush" };
+  if (isFlush && isStraight) return { rank: 9, name: "Straight Flush" };
+  if (handCounts.startsWith("4")) return { rank: 8, name: "Four of a Kind" };
+  if (handCounts.startsWith("32")) return { rank: 7, name: "Full House" };
+  if (isFlush) return { rank: 6, name: "Flush" };
+  if (isStraight) return { rank: 5, name: "Straight" };
+  if (handCounts.startsWith("3")) return { rank: 4, name: "Three of a Kind" };
+  if (handCounts.startsWith("22")) return { rank: 3, name: "Two Pair" };
+  if (handCounts.startsWith("2")) return { rank: 2, name: "One Pair" };
+  return { rank: 1, name: "High Card" };
+}
+
+function checkStraight(values) {
+  const unique = [...new Set(values)];
+  for (let i = 0; i <= unique.length - 5; i++) {
+    if (unique[i] - unique[i + 4] === 4) return true;
+  }
+  // check wheel (A-2-3-4-5)
+  if (unique.includes(14) && unique.includes(2) && unique.includes(3) &&
+      unique.includes(4) && unique.includes(5)) return true;
+  return false;
+}
+</script>
+
+
+<script>
+
+function evaluateHandsAndOuts()() { {
+  const board = [];
+  ['board1', 'board2', 'board3', 'board4'].forEach(id => {
+    const img = document.getElementById(id).querySelector('img');
+    if (img) {
+      const src = img.getAttribute('src');
+      const code = extractShortCodeFromSrc(src);
+      board.push(code);
+    }
+  });
+
+  if (board.length < 3) {
+    document.getElementById('outs-result').innerText = 'ใส่ไพ่ Flop อย่างน้อย 3 ใบก่อน';
+    return;
+  }
+
+  const players = [];
+  for (let i = 1; i <= playerCount; i++) {
+    const c1 = document.getElementById(`p${i}c1`).querySelector('img');
+    const c2 = document.getElementById(`p${i}c2`).querySelector('img');
+    if (c1 && c2) {
+      const card1 = extractShortCodeFromSrc(c1.getAttribute('src'));
+      const card2 = extractShortCodeFromSrc(c2.getAttribute('src'));
+      players.push({ id: `P${i}`, cards: [card1, card2] });
+    }
+  }
+
+  if (players.length < 2) {
+    document.getElementById('outs-result').innerText = 'ต้องมีผู้เล่นอย่างน้อย 2 คน';
+    return;
+  }
+
+  // ประเมิน hand ของแต่ละ player
+  players.forEach(p => {
+    const fullHand = [...board, ...p.cards];
+    const result = evaluateHand(fullHand);
+    p.rank = result.rank;
+    p.handName = result.name;
+  });
+
+  // หาอันดับสูงสุด
+  const maxRank = Math.max(...players.map(p => p.rank));
+  const leaders = players.filter(p => p.rank === maxRank);
+  const chasers = players.filter(p => p.rank < maxRank);
+
+  let output = "Board: " + board.join(", ") + "\n\n";
+  players.forEach(p => {
+    output += `${p.id} | ${p.cards.join(", ")} | ${p.handName}\n`;
+  });
+
+  if (chasers.length === 0) {
+    output += "\nไม่มีผู้ตาม (เสมอหรือมีผู้นำคนเดียว)";
+  } else {
+    output += "\nผู้นำ: " + leaders.map(p => p.id).join(", ");
+    output += "\nผู้ตาม: " + chasers.map(p => p.id).join(", ");
+    output += "\n(พร้อมสำหรับการจำลอง Outs)";
+  }
+
+  document.getElementById('outs-result').innerText = output;
+}
+</script>
+
+
+<script>
+// ลำดับค่าหน้าไพ่
+const RANK_ORDER = '23456789TJQKA';
+const HAND_RANKS = {
+  'High Card': 0,
+  'One Pair': 1,
+  'Two Pair': 2,
+  'Three of a Kind': 3,
+  'Straight': 4,
+  'Flush': 5,
+  'Full House': 6,
+  'Four of a Kind': 7,
+  'Straight Flush': 8,
+  'Royal Flush': 9
+};
+
+// แปลง rank เช่น '2h' → {rank: '2', suit: 'h'}
+function parseCard(card) {
+  return { rank: card[0], suit: card[1] };
+}
+
+// จัดลำดับความแข็งแกร่งของแฮนด์ (เรียงลำดับ + type)
+function evaluateHand(cards) {
+  const ranks = cards.map(c => c[0]);
+  const suits = cards.map(c => c[1]);
+  const rankCounts = {};
+  for (let r of ranks) rankCounts[r] = (rankCounts[r] || 0) + 1;
+  const counts = Object.values(rankCounts).sort((a,b) => b - a);
+  const uniqueRanks = Object.keys(rankCounts).sort((a,b) => RANK_ORDER.indexOf(b) - RANK_ORDER.indexOf(a));
+  const isFlush = suits.every(s => s === suits[0]);
+  const rankValues = ranks.map(r => RANK_ORDER.indexOf(r)).sort((a,b) => a - b);
+  const isStraight = rankValues.every((v,i,arr) => i === 0 || v - arr[i-1] === 1) || (ranks.includes('A') && ranks.includes('2') && ranks.includes('3') && ranks.includes('4') && ranks.includes('5'));
+  
+  let handType = 'High Card';
+  if (isStraight && isFlush) {
+    handType = rankValues.includes(12) && rankValues[0] === 8 ? 'Royal Flush' : 'Straight Flush';
+  } else if (counts[0] === 4) {
+    handType = 'Four of a Kind';
+  } else if (counts[0] === 3 && counts[1] === 2) {
+    handType = 'Full House';
+  } else if (isFlush) {
+    handType = 'Flush';
+  } else if (isStraight) {
+    handType = 'Straight';
+  } else if (counts[0] === 3) {
+    handType = 'Three of a Kind';
+  } else if (counts[0] === 2 && counts[1] === 2) {
+    handType = 'Two Pair';
+  } else if (counts[0] === 2) {
+    handType = 'One Pair';
+  }
+
+  // จัดอันดับสำหรับ tie breaker
+  const kicker = uniqueRanks.join('');
+  const score = HAND_RANKS[handType] * 100 + RANK_ORDER.indexOf(uniqueRanks[0]);
+
+  return { handType, kicker, score };
+}
+
+// เปรียบเทียบผู้เล่นทุกคน หาใครนำ
+function compareHands(playerHands, board) {
+  const results = [];
+  for (let p of playerHands) {
+    const fullHand = [...p.cards, ...board].map(c => c.toLowerCase());
+    const combos = getFiveCardCombos(fullHand);
+    let bestEval = { score: 0, handType: '', kicker: '' };
+    for (let combo of combos) {
+      const evalResult = evaluateHand(combo);
+      if (evalResult.score > bestEval.score || 
+         (evalResult.score === bestEval.score && evalResult.kicker > bestEval.kicker)) {
+        bestEval = evalResult;
+      }
+    }
+    results.push({ name: p.name, ...bestEval });
+  }
+
+  results.sort((a,b) => b.score - a.score || b.kicker.localeCompare(a.kicker));
+  return results;
+}
+
+// คืนทุกชุดไพ่ 5 ใบจาก 7 ใบ
+function getFiveCardCombos(cards) {
+  const res = [];
+  const combine = (start, path) => {
+    if (path.length === 5) { res.push([...path]); return; }
+    for (let i = start; i < cards.length; i++) {
+      path.push(cards[i]);
+      combine(i+1, path);
+      path.pop();
+    }
+  };
+  combine(0, []);
+  return res;
+}
+</script>
+
+
+<script>
+// บันทึกข้อมูล Outs / Rate ไว้ใน localStorage
+function saveOutsRate() {
+  const outBox = document.querySelector('.outs-box');
+  if (outBox) {
+    localStorage.setItem('outsRateResult', outBox.innerHTML);
+  }
+}
+
+// โหลดข้อมูลที่เคยบันทึกไว้
+function loadOutsRate() {
+  const saved = localStorage.getItem('outsRateResult');
+  const outBox = document.querySelector('.outs-box');
+  if (saved && outBox) {
+    outBox.innerHTML = saved;
+  }
+}
+
+// เรียกใช้ตอนโหลดหน้า
+window.addEventListener('DOMContentLoaded', () => {
+  loadOutsRate();
+});
+
+// บันทึกทุกครั้งที่มีการเปลี่ยนแปลงผล
+const observer = new MutationObserver(saveOutsRate);
+const target = document.querySelector('.outs-box');
+if (target) {
+  observer.observe(target, { childList: true, subtree: true });
+}
+</script>
+
+
+<script>
+function saveState() {
+  const board = Array.from(document.querySelectorAll('#board .card-slot img')).map(img => img.getAttribute('data-card') || '');
+  const players = Array.from(document.querySelectorAll('.player-box')).map(box => {
+    const cards = Array.from(box.querySelectorAll('.player-card img')).map(img => img.getAttribute('data-card') || '');
+    return cards;
+  });
+  const result = document.querySelector('.outs-box').innerHTML;
+  localStorage.setItem('luxu_board', JSON.stringify(board));
+  localStorage.setItem('luxu_players', JSON.stringify(players));
+  localStorage.setItem('luxu_result', result);
+}
+
+function loadState() {
+  setTimeout(() => {
+    if (typeof evaluateHandsAndOuts === 'function') {
+      evaluateHandsAndOuts();
+    }
+  }, 200);
+
+  const boardData = JSON.parse(localStorage.getItem('luxu_board') || '[]');
+  boardData.forEach((card, idx) => {
+    const slot = document.querySelectorAll('#board .card-slot')[idx];
+    if (card) {
+      const img = document.createElement('img');
+      img.src = `svg-cards/${card}.svg`;
+      img.setAttribute('data-card', card);
+      slot.innerHTML = '';
+      slot.appendChild(img);
+    }
+  });
+
+  const playersData = JSON.parse(localStorage.getItem('luxu_players') || '[]');
+  const playerBoxes = document.querySelectorAll('.player-box');
+  playersData.forEach((cards, pIdx) => {
+    const box = playerBoxes[pIdx];
+    if (!box) return;
+    const slots = box.querySelectorAll('.player-card');
+    cards.forEach((card, cIdx) => {
+      if (card) {
+        const img = document.createElement('img');
+        img.src = `svg-cards/${card}.svg`;
+        img.setAttribute('data-card', card);
+        slots[cIdx].innerHTML = '';
+        slots[cIdx].appendChild(img);
+      }
+    });
+  });
+
+  const resultBox = document.querySelector('.outs-box');
+  const storedResult = localStorage.getItem('luxu_result');
+  if (storedResult) {
+    resultBox.innerHTML = storedResult;
+  } else {
+    resultBox.innerHTML = '<h3>Outs / Rate</h3><p>ยังไม่มีข้อมูล</p>';
+  }
+  // '<h3>Outs / Rate</h3><p>ยังไม่มีข้อมูล</p>';
+}
+
+function clearState() {
+  localStorage.removeItem('luxu_board');
+  localStorage.removeItem('luxu_players');
+  localStorage.removeItem('luxu_result');
+}
+</script>
+
+
+<script>
+function confirmReset() {
+  if (confirm("คุณแน่ใจหรือไม่ว่าต้องการรีเซตทั้งหมด?")) {
+    localStorage.clear();
+    location.reload();
+  }
+}
+</script>
+
+<script>
+function confirmReset() {
+  if (confirm("คุณแน่ใจหรือไม่ว่าต้องการรีเซตทั้งหมด?")) {
+    localStorage.clear();
+    const outBox = document.querySelector('.outs-box');
+    if (outBox) outBox.innerHTML = '<h3>Outs / Rate</h3><p>ยังไม่มีข้อมูล</p>';
+    location.reload();
+  }
+}
+</script>
+
+<script>
+function confirmReset() {
+  if (confirm("คุณแน่ใจหรือไม่ว่าต้องการรีเซตทั้งหมด?")) {
+    // Clear localStorage
+    localStorage.removeItem('luxu_board');
+    localStorage.removeItem('luxu_players');
+    localStorage.removeItem('luxu_result');
+
+    // Clear UI elements directly
+    const outBox = document.querySelector('.outs-box');
+    if (outBox) outBox.innerHTML = '<h3>Outs / Rate</h3><p>ยังไม่มีข้อมูล</p>';
+
+    const boardSlots = document.querySelectorAll('#board .card-slot');
+    boardSlots.forEach(slot => slot.innerHTML = '');
+
+    const playerCards = document.querySelectorAll('.player-card');
+    playerCards.forEach(card => card.innerHTML = '');
+
+    // Refresh to reset everything
+    setTimeout(() => location.reload(), 100);
+  }
+}
+</script>
+
+<script>
+function confirmReset() {
+  if (confirm("คุณแน่ใจหรือไม่ว่าต้องการรีเซตทั้งหมด?")) {
+    // Clear localStorage
+    localStorage.removeItem('luxu_board');
+    localStorage.removeItem('luxu_players');
+    localStorage.removeItem('luxu_result');
+
+    // Clear UI elements
+    const outBox = document.querySelector('.outs-box');
+    if (outBox) {
+      outBox.innerHTML = '';
+    }
+
+    const boardSlots = document.querySelectorAll('#board .card-slot');
+    boardSlots.forEach(slot => slot.innerHTML = '');
+
+    const playerCards = document.querySelectorAll('.player-card');
+    playerCards.forEach(card => card.innerHTML = '');
+
+    // Delay 200ms to ensure DOM cleared before reload
+    setTimeout(() => location.reload(), 200);
+  }
+}
+</script>
+
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+  loadState();
+});
+
+function loadState() {
+  setTimeout(() => {
+    if (typeof evaluateHandsAndOuts === 'function') {
+      evaluateHandsAndOuts();
+    }
+  }, 200);
+
+  const boardData = JSON.parse(localStorage.getItem('luxu_board') || '[]');
+  boardData.forEach((card, idx) => {
+    const slot = document.querySelectorAll('#board .card-slot')[idx];
+    if (card && slot) {
+      const img = document.createElement('img');
+      img.src = `svg-cards/${card}.svg`;
+      img.setAttribute('data-card', card);
+      slot.innerHTML = '';
+      slot.appendChild(img);
+    }
+  });
+
+  const playersData = JSON.parse(localStorage.getItem('luxu_players') || '[]');
+  const playerBoxes = document.querySelectorAll('.player-box');
+  playersData.forEach((cards, pIdx) => {
+    const box = playerBoxes[pIdx];
+    if (!box) return;
+    const slots = box.querySelectorAll('.player-card');
+    cards.forEach((card, cIdx) => {
+      if (card) {
+        const img = document.createElement('img');
+        img.src = `svg-cards/${card}.svg`;
+        img.setAttribute('data-card', card);
+        slots[cIdx].innerHTML = '';
+        slots[cIdx].appendChild(img);
+      }
+    });
+  });
+
+  const resultBox = document.querySelector('.outs-box');
+  if (resultBox) {
+    const result = localStorage.getItem('luxu_result');
+    resultBox.innerHTML = result ? result : '<h3>Outs / Rate</h3><p>ยังไม่มีข้อมูล</p>';
+  }
+}
+</script>
+
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+  loadState();
+});
+
+function loadState() {
+  setTimeout(() => {
+    if (typeof evaluateHandsAndOuts === 'function') {
+      evaluateHandsAndOuts();
+    }
+  }, 200);
+
+  const boardData = JSON.parse(localStorage.getItem('luxu_board') || '[]');
+  boardData.forEach((card, idx) => {
+    const slot = document.querySelectorAll('#board .card-slot')[idx];
+    if (card && slot) {
+      const img = document.createElement('img');
+      img.src = `svg-cards/${card}.svg`;
+      img.setAttribute('data-card', card);
+      slot.innerHTML = '';
+      slot.appendChild(img);
+    }
+  });
+
+  const playersData = JSON.parse(localStorage.getItem('luxu_players') || '[]');
+  const playerBoxes = document.querySelectorAll('.player-box');
+  playersData.forEach((cards, pIdx) => {
+    const box = playerBoxes[pIdx];
+    if (!box) return;
+    const slots = box.querySelectorAll('.player-card');
+    cards.forEach((card, cIdx) => {
+      if (card) {
+        const img = document.createElement('img');
+        img.src = `svg-cards/${card}.svg`;
+        img.setAttribute('data-card', card);
+        slots[cIdx].innerHTML = '';
+        slots[cIdx].appendChild(img);
+      }
+    });
+  });
+
+  const resultBox = document.querySelector('.outs-box');
+  if (resultBox) {
+    if (localStorage.getItem('luxu_reset') === '1') {
+      resultBox.innerHTML = '<h3>Outs / Rate</h3><p>ยังไม่มีข้อมูล</p>';
+      localStorage.removeItem('luxu_reset');
+    } else {
+      const result = localStorage.getItem('luxu_result');
+      if (result) resultBox.innerHTML = result;
+    }
+  }
+}
+
+function confirmReset() {
+  if (confirm("คุณแน่ใจหรือไม่ว่าต้องการรีเซตทั้งหมด?")) {
+    // Set reset flag
+    localStorage.setItem('luxu_reset', '1');
+
+    // Clear related data
+    localStorage.removeItem('luxu_board');
+    localStorage.removeItem('luxu_players');
+    localStorage.removeItem('luxu_result');
+
+    // Clear UI (DOM)
+    document.querySelectorAll('#board .card-slot').forEach(slot => slot.innerHTML = '');
+    document.querySelectorAll('.player-card').forEach(slot => slot.innerHTML = '');
+
+    // Delay and reload
+    setTimeout(() => location.reload(), 150);
+  }
+}
+</script>
+</body>
+</html>
