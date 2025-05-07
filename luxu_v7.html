@@ -539,5 +539,69 @@ function checkStraight(values) {
 }
 </script>
 
+
+<script>
+function evaluateHandsAndOuts() {
+  const board = [];
+  ['board1', 'board2', 'board3', 'board4'].forEach(id => {
+    const img = document.getElementById(id).querySelector('img');
+    if (img) {
+      const src = img.getAttribute('src');
+      const code = extractShortCodeFromSrc(src);
+      board.push(code);
+    }
+  });
+
+  if (board.length < 3) {
+    document.getElementById('outs-result').innerText = 'ใส่ไพ่ Flop อย่างน้อย 3 ใบก่อน';
+    return;
+  }
+
+  const players = [];
+  for (let i = 1; i <= playerCount; i++) {
+    const c1 = document.getElementById(`p${i}c1`).querySelector('img');
+    const c2 = document.getElementById(`p${i}c2`).querySelector('img');
+    if (c1 && c2) {
+      const card1 = extractShortCodeFromSrc(c1.getAttribute('src'));
+      const card2 = extractShortCodeFromSrc(c2.getAttribute('src'));
+      players.push({ id: `P${i}`, cards: [card1, card2] });
+    }
+  }
+
+  if (players.length < 2) {
+    document.getElementById('outs-result').innerText = 'ต้องมีผู้เล่นอย่างน้อย 2 คน';
+    return;
+  }
+
+  // ประเมิน hand ของแต่ละ player
+  players.forEach(p => {
+    const fullHand = [...board, ...p.cards];
+    const result = evaluateHand(fullHand);
+    p.rank = result.rank;
+    p.handName = result.name;
+  });
+
+  // หาอันดับสูงสุด
+  const maxRank = Math.max(...players.map(p => p.rank));
+  const leaders = players.filter(p => p.rank === maxRank);
+  const chasers = players.filter(p => p.rank < maxRank);
+
+  let output = "Board: " + board.join(", ") + "\n\n";
+  players.forEach(p => {
+    output += `${p.id} | ${p.cards.join(", ")} | ${p.handName}\n`;
+  });
+
+  if (chasers.length === 0) {
+    output += "\nไม่มีผู้ตาม (เสมอหรือมีผู้นำคนเดียว)";
+  } else {
+    output += "\nผู้นำ: " + leaders.map(p => p.id).join(", ");
+    output += "\nผู้ตาม: " + chasers.map(p => p.id).join(", ");
+    output += "\n(พร้อมสำหรับการจำลอง Outs)";
+  }
+
+  document.getElementById('outs-result').innerText = output;
+}
+</script>
+
 </body>
 </html>
