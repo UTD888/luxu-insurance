@@ -100,7 +100,7 @@
     }
   </style>
 </head>
-<body>
+<body onload="loadState()">
 
   <h1>LUXU POKER INSURANCE</h1>
 
@@ -744,6 +744,61 @@ const observer = new MutationObserver(saveOutsRate);
 const target = document.querySelector('.outs-box');
 if (target) {
   observer.observe(target, { childList: true, subtree: true });
+}
+</script>
+
+
+<script>
+function saveState() {
+  const board = Array.from(document.querySelectorAll('#board .card-slot img')).map(img => img.getAttribute('data-card') || '');
+  const players = Array.from(document.querySelectorAll('.player-box')).map(box => {
+    const cards = Array.from(box.querySelectorAll('.player-card img')).map(img => img.getAttribute('data-card') || '');
+    return cards;
+  });
+  const result = document.querySelector('.outs-box').innerHTML;
+  localStorage.setItem('luxu_board', JSON.stringify(board));
+  localStorage.setItem('luxu_players', JSON.stringify(players));
+  localStorage.setItem('luxu_result', result);
+}
+
+function loadState() {
+  const boardData = JSON.parse(localStorage.getItem('luxu_board') || '[]');
+  boardData.forEach((card, idx) => {
+    const slot = document.querySelectorAll('#board .card-slot')[idx];
+    if (card) {
+      const img = document.createElement('img');
+      img.src = `svg-cards/${card}.svg`;
+      img.setAttribute('data-card', card);
+      slot.innerHTML = '';
+      slot.appendChild(img);
+    }
+  });
+
+  const playersData = JSON.parse(localStorage.getItem('luxu_players') || '[]');
+  const playerBoxes = document.querySelectorAll('.player-box');
+  playersData.forEach((cards, pIdx) => {
+    const box = playerBoxes[pIdx];
+    if (!box) return;
+    const slots = box.querySelectorAll('.player-card');
+    cards.forEach((card, cIdx) => {
+      if (card) {
+        const img = document.createElement('img');
+        img.src = `svg-cards/${card}.svg`;
+        img.setAttribute('data-card', card);
+        slots[cIdx].innerHTML = '';
+        slots[cIdx].appendChild(img);
+      }
+    });
+  });
+
+  const resultBox = document.querySelector('.outs-box');
+  resultBox.innerHTML = localStorage.getItem('luxu_result') || '<h3>Outs / Rate</h3><p>ยังไม่มีข้อมูล</p>';
+}
+
+function clearState() {
+  localStorage.removeItem('luxu_board');
+  localStorage.removeItem('luxu_players');
+  localStorage.removeItem('luxu_result');
 }
 </script>
 
