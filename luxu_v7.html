@@ -822,5 +822,29 @@ function confirmReset() {
   }
 }
 </script>
+
+<script>
+function confirmReset() {
+  if (confirm("คุณแน่ใจหรือไม่ว่าต้องการรีเซตทั้งหมด?")) {
+    // Clear localStorage
+    localStorage.removeItem('luxu_board');
+    localStorage.removeItem('luxu_players');
+    localStorage.removeItem('luxu_result');
+
+    // Clear UI elements directly
+    const outBox = document.querySelector('.outs-box');
+    if (outBox) outBox.innerHTML = '<h3>Outs / Rate</h3><p>ยังไม่มีข้อมูล</p>';
+
+    const boardSlots = document.querySelectorAll('#board .card-slot');
+    boardSlots.forEach(slot => slot.innerHTML = '');
+
+    const playerCards = document.querySelectorAll('.player-card');
+    playerCards.forEach(card => card.innerHTML = '');
+
+    // Refresh to reset everything
+    setTimeout(() => location.reload(), 100);
+  }
+}
+</script>
 </body>
 </html>
