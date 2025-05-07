@@ -715,5 +715,37 @@ function getFiveCardCombos(cards) {
 }
 </script>
 
+
+<script>
+// บันทึกข้อมูล Outs / Rate ไว้ใน localStorage
+function saveOutsRate() {
+  const outBox = document.querySelector('.outs-box');
+  if (outBox) {
+    localStorage.setItem('outsRateResult', outBox.innerHTML);
+  }
+}
+
+// โหลดข้อมูลที่เคยบันทึกไว้
+function loadOutsRate() {
+  const saved = localStorage.getItem('outsRateResult');
+  const outBox = document.querySelector('.outs-box');
+  if (saved && outBox) {
+    outBox.innerHTML = saved;
+  }
+}
+
+// เรียกใช้ตอนโหลดหน้า
+window.addEventListener('DOMContentLoaded', () => {
+  loadOutsRate();
+});
+
+// บันทึกทุกครั้งที่มีการเปลี่ยนแปลงผล
+const observer = new MutationObserver(saveOutsRate);
+const target = document.querySelector('.outs-box');
+if (target) {
+  observer.observe(target, { childList: true, subtree: true });
+}
+</script>
+
 </body>
 </html>
