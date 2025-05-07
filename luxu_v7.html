@@ -1032,5 +1032,104 @@ const observer = new MutationObserver(() => {
 
 observer.observe(document.body, { childList: true, subtree: true });
 </script>
+
+<script>
+// ฟังก์ชันแปลง rank เป็นตัวเลข
+const rankOrder = "23456789TJQKA".split("");
+
+function getRankValue(rank) {
+  return rankOrder.indexOf(rank);
+}
+
+function getHandStrength(cards) {
+  // ใช้แฮนด์ evaluator ง่าย: แค่ rank รวม
+  const ranks = cards.map(c => c[0]);
+  const values = ranks.map(r => getRankValue(r));
+  return values.sort((a,b) => b - a).slice(0, 5);
+}
+
+function evaluateHandsAndOuts() {
+  const board = [];
+  ['board1', 'board2', 'board3', 'board4'].forEach(id => {
+    const el = document.getElementById(id);
+    const img = el ? el.querySelector('img') : null;
+    const code = img?.getAttribute('data-card');
+    if (code) board.push(code);
+  });
+
+  const players = [];
+  for (let i = 1; i <= 9; i++) {
+    const c1 = document.getElementById(`p${i}c1`)?.querySelector('img')?.getAttribute('data-card');
+    const c2 = document.getElementById(`p${i}c2`)?.querySelector('img')?.getAttribute('data-card');
+    if (c1 && c2) {
+      players.push({ id: `P${i}`, cards: [c1, c2] });
+    }
+  }
+
+  if (board.length < 3 || players.length < 2) {
+    document.querySelector('.outs-box').innerHTML = '<h3>Outs / Rate</h3><p>ต้องมีไพ่ Flop อย่างน้อย 3 ใบ และผู้เล่น 2 คนขึ้นไป</p>';
+    return;
+  }
+
+  const deck = generateDeck([...board, ...players.flatMap(p => p.cards)]);
+  const board4 = board.slice(0, 4);
+  const needRiver = board.length === 4;
+  const outsMap = {};
+
+  for (let card of deck) {
+    const simulatedBoard = needRiver ? [...board4, card] : [...board, card];
+    const hands = players.map(p => {
+      const full = [...simulatedBoard, ...p.cards];
+      return { id: p.id, strength: getHandStrength(full), full };
+    });
+
+    hands.sort((a,b) => compareStrength(b.strength, a.strength));
+    const best = hands[0].strength;
+    const winners = hands.filter(h => compareStrength(h.strength, best) === 0);
+
+    if (winners.length === 1) {
+      const winner = winners[0].id;
+      for (let p of players) {
+        if (p.id !== winner) {
+          outsMap[p.id] = outsMap[p.id] || [];
+          outsMap[p.id].push(card);
+        }
+      }
+    }
+  }
+
+  let result = "<h3>Outs / Rate</h3>";
+  for (let [pid, cards] of Object.entries(outsMap)) {
+    result += `<p>${pid}: ${cards.length} Outs - [${cards.join(", ")}]</p>`;
+  }
+
+  if (Object.keys(outsMap).length === 0) {
+    result += "<p>ไม่มี Outs ที่ทำให้ผู้ตามชนะได้</p>";
+  }
+
+  document.querySelector('.outs-box').innerHTML = result;
+}
+
+function generateDeck(exclude) {
+  const suits = ['h','d','s','c'];
+  const ranks = '23456789TJQKA'.split('');
+  const full = [];
+  for (let r of ranks) {
+    for (let s of suits) {
+      const c = r + s;
+      if (!exclude.includes(c)) full.push(c);
+    }
+  }
+  return full;
+}
+
+function compareStrength(a, b) {
+  for (let i = 0; i < Math.min(a.length, b.length); i++) {
+    if (a[i] !== b[i]) return a[i] - b[i];
+  }
+  return 0;
+}
+</script>
 </body>
+
 </html>
