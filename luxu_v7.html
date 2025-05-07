@@ -618,5 +618,102 @@ function evaluateHandsAndOuts() {
 }
 </script>
 
+
+<script>
+// ลำดับค่าหน้าไพ่
+const RANK_ORDER = '23456789TJQKA';
+const HAND_RANKS = {
+  'High Card': 0,
+  'One Pair': 1,
+  'Two Pair': 2,
+  'Three of a Kind': 3,
+  'Straight': 4,
+  'Flush': 5,
+  'Full House': 6,
+  'Four of a Kind': 7,
+  'Straight Flush': 8,
+  'Royal Flush': 9
+};
+
+// แปลง rank เช่น '2h' → {rank: '2', suit: 'h'}
+function parseCard(card) {
+  return { rank: card[0], suit: card[1] };
+}
+
+// จัดลำดับความแข็งแกร่งของแฮนด์ (เรียงลำดับ + type)
+function evaluateHand(cards) {
+  const ranks = cards.map(c => c[0]);
+  const suits = cards.map(c => c[1]);
+  const rankCounts = {};
+  for (let r of ranks) rankCounts[r] = (rankCounts[r] || 0) + 1;
+  const counts = Object.values(rankCounts).sort((a,b) => b - a);
+  const uniqueRanks = Object.keys(rankCounts).sort((a,b) => RANK_ORDER.indexOf(b) - RANK_ORDER.indexOf(a));
+  const isFlush = suits.every(s => s === suits[0]);
+  const rankValues = ranks.map(r => RANK_ORDER.indexOf(r)).sort((a,b) => a - b);
+  const isStraight = rankValues.every((v,i,arr) => i === 0 || v - arr[i-1] === 1) || (ranks.includes('A') && ranks.includes('2') && ranks.includes('3') && ranks.includes('4') && ranks.includes('5'));
+  
+  let handType = 'High Card';
+  if (isStraight && isFlush) {
+    handType = rankValues.includes(12) && rankValues[0] === 8 ? 'Royal Flush' : 'Straight Flush';
+  } else if (counts[0] === 4) {
+    handType = 'Four of a Kind';
+  } else if (counts[0] === 3 && counts[1] === 2) {
+    handType = 'Full House';
+  } else if (isFlush) {
+    handType = 'Flush';
+  } else if (isStraight) {
+    handType = 'Straight';
+  } else if (counts[0] === 3) {
+    handType = 'Three of a Kind';
+  } else if (counts[0] === 2 && counts[1] === 2) {
+    handType = 'Two Pair';
+  } else if (counts[0] === 2) {
+    handType = 'One Pair';
+  }
+
+  // จัดอันดับสำหรับ tie breaker
+  const kicker = uniqueRanks.join('');
+  const score = HAND_RANKS[handType] * 100 + RANK_ORDER.indexOf(uniqueRanks[0]);
+
+  return { handType, kicker, score };
+}
+
+// เปรียบเทียบผู้เล่นทุกคน หาใครนำ
+function compareHands(playerHands, board) {
+  const results = [];
+  for (let p of playerHands) {
+    const fullHand = [...p.cards, ...board].map(c => c.toLowerCase());
+    const combos = getFiveCardCombos(fullHand);
+    let bestEval = { score: 0, handType: '', kicker: '' };
+    for (let combo of combos) {
+      const evalResult = evaluateHand(combo);
+      if (evalResult.score > bestEval.score || 
+         (evalResult.score === bestEval.score && evalResult.kicker > bestEval.kicker)) {
+        bestEval = evalResult;
+      }
+    }
+    results.push({ name: p.name, ...bestEval });
+  }
+
+  results.sort((a,b) => b.score - a.score || b.kicker.localeCompare(a.kicker));
+  return results;
+}
+
+// คืนทุกชุดไพ่ 5 ใบจาก 7 ใบ
+function getFiveCardCombos(cards) {
+  const res = [];
+  const combine = (start, path) => {
+    if (path.length === 5) { res.push([...path]); return; }
+    for (let i = start; i < cards.length; i++) {
+      path.push(cards[i]);
+      combine(i+1, path);
+      path.pop();
+    }
+  };
+  combine(0, []);
+  return res;
+}
+</script>
+
 </body>
 </html>
