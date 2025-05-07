@@ -279,7 +279,7 @@
   box-shadow: 0 0 5px #00ffc8;
 }
 </style>
-</head>
+<script src="https://cdn.jsdelivr.net/gh/cheatcode/poker-evaluator@master/dist/poker-evaluator.min.js"></script></head>
 <body><button onclick="resetAllCards()" style="margin: 20px auto; display: block; padding: 8px 16px; font-size: 16px; border-radius: 6px; background: #800; color: white; border: none; cursor: pointer;">🗑️ Reset All Cards</button>
 <div id="resultsBox" style="margin: 30px auto; max-width: 600px; background: #111; border: 2px solid #444; border-radius: 12px; padding: 20px; color: #fff; text-align: center; font-family: sans-serif; box-shadow: 0 2px 8px rgba(0,0,0,0.6);">
 <h2 style="margin-top: 0;">🧠 Calculation Result</h2>
@@ -574,5 +574,62 @@ document.querySelectorAll(".card-slot").forEach(slot => {
 <div class="popup-grid" id="cardOptions"></div>
 </div>
 </div>
-</body>
+<script>
+function convertCard(cardKey) {
+  const rankMap = {
+    "2": "2", "3": "3", "4": "4", "5": "5", "6": "6",
+    "7": "7", "8": "8", "9": "9", "10": "T",
+    "jack": "J", "queen": "Q", "king": "K", "ace": "A"
+  };
+  const suitMap = {
+    "spades": "s", "hearts": "h", "diamonds": "d", "clubs": "c"
+  };
+  const parts = cardKey.split("_of_");
+  return rankMap[parts[0]] + suitMap[parts[1]];
+}
+
+function calculateOutsAndRate() {
+  const used = getAllUsedCards();
+  if (used.length < 3 + (2 * 2)) return;
+
+  const board = used.slice(0, 4); // Flop + optional Turn
+  const playerCards = [];
+  const playerBoxes = document.querySelectorAll('.player-box');
+  playerBoxes.forEach(box => {
+    const cards = box.querySelectorAll('.card-slot');
+    if (cards.length >= 2 &&
+        cards[0].dataset.cardKey && cards[1].dataset.cardKey) {
+      playerCards.push([cards[0].dataset.cardKey, cards[1].dataset.cardKey]);
+    }
+  });
+
+  if (playerCards.length < 2) return;
+
+  const mode = board.length === 3 ? 'turn' : 'river';
+  const deck = getRemainingDeck(used);
+  let outs = 0;
+
+  deck.forEach(testCard => {
+    const testBoard = [...board, testCard];
+    const boardConverted = testBoard.map(convertCard);
+    const handScores = playerCards.map(p => {
+      const holeCards = p.map(convertCard);
+      const fullHand = holeCards.concat(boardConverted);
+      return window.PokerEvaluator.evalHand(fullHand).value;
+    });
+    const minScore = Math.min(...handScores);
+    const winnerIndex = handScores.indexOf(minScore);
+    if (winnerIndex !== 0) outs++;
+  });
+
+  document.getElementById("outsResult").innerText = outs;
+  document.getElementById("rateResult").innerText = getRateFromOuts(outs);
+}
+
+document.querySelectorAll(".card-slot").forEach(slot => {
+  slot.addEventListener("click", () => {
+    setTimeout(() => calculateOutsAndRate(), 200);
+  });
+});
+</script></body>
 </html>
