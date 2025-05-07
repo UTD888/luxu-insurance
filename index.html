@@ -280,7 +280,7 @@
 }
 </style>
 </head>
-<body>
+<body><button onclick="resetAllCards()" style="margin: 20px auto; display: block; padding: 8px 16px; font-size: 16px; border-radius: 6px; background: #800; color: white; border: none; cursor: pointer;">🗑️ Reset All Cards</button>
 <h1>Luxu Insurance</h1>
 <div class="section-title">Board: Flop + Turn</div>
 <div class="board-grid">
@@ -394,6 +394,82 @@ let currentSlot = null;
 
 window.onload = () => {
   bindCardSlots();
+};
+
+function saveAllCards() {
+  const slots = document.querySelectorAll(".card-slot");
+  const cardData = [];
+  slots.forEach(slot => {
+    cardData.push(slot.dataset.cardKey || null);
+  });
+  localStorage.setItem("luxuCardData", JSON.stringify(cardData));
+}
+
+function loadAllCards() {
+  const data = localStorage.getItem("luxuCardData");
+  if (!data) return;
+  const cardData = JSON.parse(data);
+  const slots = document.querySelectorAll(".card-slot");
+  cardData.forEach((cardKey, i) => {
+    if (cardKey && slots[i]) {
+      slots[i].style.backgroundImage = `url('svg-cards/${cardKey}.svg')`;
+      slots[i].textContent = '';
+      slots[i].dataset.cardKey = cardKey;
+      usedCards.add(cardKey);
+    }
+  });
+}
+
+function resetAllCards() {
+  localStorage.removeItem("luxuCardData");
+  const slots = document.querySelectorAll(".card-slot");
+  slots.forEach(slot => {
+    slot.style.backgroundImage = "url('luxulogo.png')";
+    slot.textContent = "?";
+    if (slot.dataset.cardKey) {
+      usedCards.delete(slot.dataset.cardKey);
+    }
+    delete slot.dataset.cardKey;
+  });
+}
+
+function openCardPicker(slot) {
+  currentSlot = slot;
+  document.getElementById("cardPicker").style.display = "flex";
+  showTab('spades');
+}
+
+function closePopup() {
+  document.getElementById("cardPicker").style.display = "none";
+}
+
+function showTab(suit) {
+  const row = document.getElementById("cardOptions");
+  row.innerHTML = '';
+  for (let rank of allRanks) {
+    const key = getCardKey(rank, suit);
+    if (usedCards.has(key)) continue;
+    const img = document.createElement('img');
+    img.src = `svg-cards/${key}.svg`;
+    img.alt = key;
+    img.onclick = () => {
+      if (currentSlot.dataset.cardKey) {
+        usedCards.delete(currentSlot.dataset.cardKey);
+      }
+      currentSlot.style.backgroundImage = `url('svg-cards/${key}.svg')`;
+      currentSlot.textContent = '';
+      currentSlot.dataset.cardKey = key;
+      usedCards.add(key);
+      saveAllCards();
+      closePopup();
+    };
+    row.appendChild(img);
+  }
+}
+
+window.onload = () => {
+  bindCardSlots();
+  loadAllCards();
 };
 </script>
 <div class="popup" id="cardPicker">
