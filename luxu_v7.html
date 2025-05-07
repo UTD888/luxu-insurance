@@ -418,5 +418,77 @@ window.onload = () => {
 };
 </script>
 
+
+<script>
+// เรียกใช้ทันทีเมื่อไพ่บน board >= 3 และ player >= 2 คน
+function evaluateHandsAndOuts() {
+  const board = [];
+  ['board1', 'board2', 'board3', 'board4'].forEach(id => {
+    const img = document.getElementById(id).querySelector('img');
+    if (img) {
+      const src = img.getAttribute('src');
+      const code = extractShortCodeFromSrc(src);
+      board.push(code);
+    }
+  });
+
+  if (board.length < 3) {
+    document.getElementById('outs-result').innerText = 'ใส่ไพ่ Flop อย่างน้อย 3 ใบก่อน';
+    return;
+  }
+
+  const players = [];
+  for (let i = 1; i <= playerCount; i++) {
+    const c1 = document.getElementById(`p${i}c1`).querySelector('img');
+    const c2 = document.getElementById(`p${i}c2`).querySelector('img');
+    if (c1 && c2) {
+      const card1 = extractShortCodeFromSrc(c1.getAttribute('src'));
+      const card2 = extractShortCodeFromSrc(c2.getAttribute('src'));
+      players.push({ id: `P${i}`, cards: [card1, card2] });
+    }
+  }
+
+  if (players.length < 2) {
+    document.getElementById('outs-result').innerText = 'ต้องมีผู้เล่นอย่างน้อย 2 คน';
+    return;
+  }
+
+  // จำลองการคำนวณ (mock): แสดงไพ่ที่มี, ยังไม่เปรียบเทียบ
+  let output = 'Board: ' + board.join(', ') + '\n';
+  players.forEach(p => {
+    output += `${p.id}: ${p.cards.join(', ')}\n`;
+  });
+
+  output += '\n(ระบบกำลังพัฒนา: ยังไม่ได้ประเมิน Hand และ Outs จริง)';
+
+  document.getElementById('outs-result').innerText = output;
+}
+
+// แปลงชื่อไฟล์ SVG → เป็นรหัสสั้นเช่น "Qh"
+function extractShortCodeFromSrc(src) {
+  const name = src.split("/").pop().replace(".svg", ""); // e.g. queen_of_hearts
+  const [rankRaw, suitRaw] = name.split("_of_");
+  const rank = { jack: 'J', queen: 'Q', king: 'K', ace: 'A' }[rankRaw] || rankRaw;
+  const suit = { hearts: 'h', diamonds: 'd', clubs: 'c', spades: 's' }[suitRaw];
+  return rank + suit;
+}
+
+// เรียก evaluate ทุกครั้งหลังเลือกไพ่
+function selectCard(cardCode) {
+  if (currentTargetId) {
+    const target = document.getElementById(currentTargetId);
+    const rank = cardCode.slice(0, -1);
+    const suit = cardCode.slice(-1);
+    const suitName = { d: 'diamonds', c: 'clubs', h: 'hearts', s: 'spades' }[suit];
+    const fileName = `${rank}_of_${suitName}.svg`;
+    target.innerHTML = `<img src="svg-cards/${fileName}" height="100%">`;
+    usedCards.add(cardCode);
+    saveAllCards();
+    closeCardPicker();
+    setTimeout(evaluateHandsAndOuts, 100); // เรียกคำนวณใหม่หลังใส่ไพ่
+  }
+}
+</script>
+
 </body>
 </html>
