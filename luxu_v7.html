@@ -792,7 +792,13 @@ function loadState() {
   });
 
   const resultBox = document.querySelector('.outs-box');
-  resultBox.innerHTML = localStorage.getItem('luxu_result') || '<h3>Outs / Rate</h3><p>ยังไม่มีข้อมูล</p>';
+  const storedResult = localStorage.getItem('luxu_result');
+  if (storedResult) {
+    resultBox.innerHTML = storedResult;
+  } else {
+    resultBox.innerHTML = '<h3>Outs / Rate</h3><p>ยังไม่มีข้อมูล</p>';
+  }
+  // '<h3>Outs / Rate</h3><p>ยังไม่มีข้อมูล</p>';
 }
 
 function clearState() {
