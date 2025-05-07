@@ -206,7 +206,11 @@
         if (!usedCards.has(cardCode)) {
           const btn = document.createElement('button');
           btn.className = 'btn btn-outline-light btn-sm';
-          const rank = cardCode.slice(0, -1);
+          let rank = cardCode.slice(0, -1);
+if (rank === 'J') rank = 'jack';
+else if (rank === 'Q') rank = 'queen';
+else if (rank === 'K') rank = 'king';
+else if (rank === 'A') rank = 'ace';
 const suit = cardCode.slice(-1);
 const suitName = { d: 'diamonds', c: 'clubs', h: 'hearts', s: 'spades' }[suit];
 const fileName = `${rank}_of_${suitName}.svg`;
@@ -232,7 +236,11 @@ btn.innerHTML = `<img src="svg-cards/${fileName}" height="50">`;
   function selectCard(cardCode) {
     if (currentTargetId) {
       const target = document.getElementById(currentTargetId);
-      const rank = cardCode.slice(0, -1);
+      let rank = cardCode.slice(0, -1);
+if (rank === 'J') rank = 'jack';
+else if (rank === 'Q') rank = 'queen';
+else if (rank === 'K') rank = 'king';
+else if (rank === 'A') rank = 'ace';
 const suit = cardCode.slice(-1);
 const suitName = { d: 'diamonds', c: 'clubs', h: 'hearts', s: 'spades' }[suit];
 const fileName = `${rank}_of_${suitName}.svg`;
