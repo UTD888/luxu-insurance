@@ -1033,38 +1033,24 @@ const observer = new MutationObserver(() => {
 observer.observe(document.body, { childList: true, subtree: true });
 </script>
 
+
 <script>
-// ฟังก์ชันแปลง rank เป็นตัวเลข
-const rankOrder = "23456789TJQKA".split("");
-
-function getRankValue(rank) {
-  return rankOrder.indexOf(rank);
-}
-
-function getHandStrength(cards) {
-  // ใช้แฮนด์ evaluator ง่าย: แค่ rank รวม
-  const ranks = cards.map(c => c[0]);
-  const values = ranks.map(r => getRankValue(r));
-  return values.sort((a,b) => b - a).slice(0, 5);
-}
-
 function evaluateHandsAndOuts() {
   const board = [];
-  ['board1', 'board2', 'board3', 'board4'].forEach(id => {
-    const el = document.getElementById(id);
-    const img = el ? el.querySelector('img') : null;
-    const code = img?.getAttribute('data-card');
-    if (code) board.push(code);
+  document.querySelectorAll('#board .card-slot img').forEach(img => {
+    const card = img.getAttribute('data-card');
+    if (card) board.push(card);
   });
 
   const players = [];
-  for (let i = 1; i <= 9; i++) {
-    const c1 = document.getElementById(`p${i}c1`)?.querySelector('img')?.getAttribute('data-card');
-    const c2 = document.getElementById(`p${i}c2`)?.querySelector('img')?.getAttribute('data-card');
-    if (c1 && c2) {
-      players.push({ id: `P${i}`, cards: [c1, c2] });
+  document.querySelectorAll('.player-box').forEach((box, idx) => {
+    const imgs = box.querySelectorAll('.player-card img');
+    if (imgs.length === 2) {
+      const c1 = imgs[0].getAttribute('data-card');
+      const c2 = imgs[1].getAttribute('data-card');
+      if (c1 && c2) players.push({ id: `P${idx + 1}`, cards: [c1, c2] });
     }
-  }
+  });
 
   if (board.length < 3 || players.length < 2) {
     document.querySelector('.outs-box').innerHTML = '<h3>Outs / Rate</h3><p>ต้องมีไพ่ Flop อย่างน้อย 3 ใบ และผู้เล่น 2 คนขึ้นไป</p>';
@@ -1110,6 +1096,16 @@ function evaluateHandsAndOuts() {
   document.querySelector('.outs-box').innerHTML = result;
 }
 
+function getRankValue(rank) {
+  return "23456789TJQKA".indexOf(rank);
+}
+
+function getHandStrength(cards) {
+  const ranks = cards.map(c => c[0]);
+  const values = ranks.map(r => getRankValue(r));
+  return values.sort((a,b) => b - a).slice(0, 5);
+}
+
 function generateDeck(exclude) {
   const suits = ['h','d','s','c'];
   const ranks = '23456789TJQKA'.split('');
@@ -1131,5 +1127,3 @@ function compareStrength(a, b) {
 }
 </script>
 </body>
-
-</html>
