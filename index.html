@@ -58,7 +58,7 @@
     }
 
     .player-slot {
-      /* border removed */
+      border: 1px solid #444;
       padding: 10px;
       border-radius: 8px;
     }
@@ -162,11 +162,7 @@
   </div>
 
   <div class="section-title">Players</div>
-  <div style="margin-bottom: 15px;">
-    <button onclick="addPlayer()">+ เพิ่มผู้เล่น</button>
-    <button onclick="removePlayer()">− ลบผู้เล่น</button>
-  </div>
-  <div class="player-grid" id="playerGrid">
+  <div class="player-grid">
     <div class="player-slot">
       <div class="player-name">Player 1</div>
       <div class="player-cards">
@@ -190,6 +186,8 @@
   </div>
 
   
+
+
 <!-- Card Picker Popup with Horizontal Layout -->
 <div class="popup" id="cardPicker">
   <div class="popup-inner">
@@ -312,110 +310,6 @@
     });
   };
 </script>
-
-  <div class="popup" id="cardPicker">
-    <div class="popup-inner">
-      <div class="card-tabs">
-        <div class="tab-buttons">
-          <button onclick="showTab('spades')">♠</button>
-          <button onclick="showTab('hearts')">♥</button>
-          <button onclick="showTab('diamonds')">♦</button>
-          <button onclick="showTab('clubs')">♣</button>
-        </div>
-        <button class="close-btn" onclick="closePopup()">X</button>
-      </div>
-      <hr style="width: 100%; border-color: #555;">
-      <div class="popup-grid" id="cardOptions"></div>
-    </div>
-  </div>
-
-  <script>
-    let playerCount = 2;
-    const maxPlayers = 9;
-    const minPlayers = 2;
-
-    function updatePlayerGrid() {
-      const grid = document.getElementById("playerGrid");
-      grid.innerHTML = "";
-      for (let i = 1; i <= playerCount; i++) {
-        const slot = document.createElement("div");
-        slot.className = "player-slot";
-        slot.innerHTML = `
-          <div class="player-name">Player ${i}</div>
-          <div class="player-cards">
-            <div class="card-slot">?</div>
-            <div class="card-slot">?</div>
-          </div>
-        `;
-        grid.appendChild(slot);
-      }
-
-      // rebind slot click events
-      setTimeout(() => {
-        document.querySelectorAll(".card-slot").forEach(slot => {
-          slot.onclick = () => openCardPicker(slot);
-        });
-      }, 50);
-    }
-
-    function addPlayer() {
-      if (playerCount < maxPlayers) {
-        playerCount++;
-        updatePlayerGrid();
-      }
-    }
-
-    function removePlayer() {
-      if (playerCount > minPlayers) {
-        playerCount--;
-        updatePlayerGrid();
-      }
-    }
-
-    window.onload = () => {
-      updatePlayerGrid();
-      document.querySelectorAll(".card-slot").forEach(slot => {
-        slot.onclick = () => openCardPicker(slot);
-      });
-    };
-
-    const allRanks = ['2','3','4','5','6','7','8','9','10','jack','queen','king','ace'];
-    const allSuits = ['spades','hearts','clubs','diamonds'];
-    let currentSlot = null;
-
-    function openCardPicker(slot) {
-      currentSlot = slot;
-      document.getElementById("cardPicker").style.display = "flex";
-      showTab('spades');
-    }
-
-    function closePopup() {
-      document.getElementById("cardPicker").style.display = "none";
-    }
-
-    function showTab(suit) {
-      const picker = document.getElementById("cardOptions");
-      picker.innerHTML = '';
-      for (let rank of allRanks) {
-        const filename = `${rank}_of_${suit}.svg`;
-        const img = document.createElement('img');
-        img.src = `svg-cards/${filename}`;
-        img.alt = filename;
-        img.onclick = () => {
-          currentSlot.style.backgroundImage = `url('svg-cards/${filename}')`;
-          currentSlot.textContent = '';
-          closePopup();
-        };
-        picker.appendChild(img);
-      }
-    }
-
-    window.onload = () => {
-      document.querySelectorAll(".card-slot").forEach(slot => {
-        slot.onclick = () => openCardPicker(slot);
-      });
-    };
-  </script>
 
 </body>
 </html>
