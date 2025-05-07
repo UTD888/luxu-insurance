@@ -431,7 +431,8 @@ window.onload = () => {
 
 <script>
 // เรียกใช้ทันทีเมื่อไพ่บน board >= 3 และ player >= 2 คน
-function evaluateHandsAndOuts() {
+
+function evaluateHandsAndOuts()() { {
   const board = [];
   ['board1', 'board2', 'board3', 'board4'].forEach(id => {
     const img = document.getElementById(id).querySelector('img');
@@ -556,7 +557,8 @@ function checkStraight(values) {
 
 
 <script>
-function evaluateHandsAndOuts() {
+
+function evaluateHandsAndOuts()() { {
   const board = [];
   ['board1', 'board2', 'board3', 'board4'].forEach(id => {
     const img = document.getElementById(id).querySelector('img');
@@ -1005,6 +1007,30 @@ function confirmReset() {
     setTimeout(() => location.reload(), 150);
   }
 }
+</script>
+
+<script>
+// เรียกคำนวณเมื่อ DOM ของไพ่เปลี่ยนแปลง
+const observer = new MutationObserver(() => {
+  const boardReady = ['board1', 'board2', 'board3'].every(id => {
+    const img = document.getElementById(id)?.querySelector('img');
+    return img?.getAttribute('data-card');
+  });
+
+  const playerReady = Array.from(document.querySelectorAll('.player-box')).filter(box => {
+    const cards = box.querySelectorAll('.player-card img');
+    return cards.length === 2 &&
+           cards[0].getAttribute('data-card') &&
+           cards[1].getAttribute('data-card');
+  });
+
+  if (boardReady && playerReady.length >= 2) {
+    evaluateHandsAndOuts();
+    observer.disconnect(); // คำนวณครั้งเดียวพอ
+  }
+});
+
+observer.observe(document.body, { childList: true, subtree: true });
 </script>
 </body>
 </html>
