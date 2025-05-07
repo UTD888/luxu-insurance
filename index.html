@@ -57,7 +57,6 @@
       justify-content: center;
     }
 
-    .card-slot {
       width: 70px;
       height: 100px;
       background-color: #333;
@@ -137,7 +136,6 @@
     }
   
     @media screen and (max-width: 768px) {
-      .card-slot {
         width: 50px;
         height: 70px;
         font-size: 14px;
@@ -159,7 +157,6 @@
     }
 
     @media screen and (max-width: 480px) {
-      .card-slot {
         width: 45px;
         height: 65px;
         font-size: 12px;
@@ -258,6 +255,28 @@
 .card-tabs button[data-suit="diamonds"] {
   color: red;
   background-color: #fdd;
+}
+.card-slot {
+  width: 80px;
+  height: 110px;
+  background-image: url('luxulogo.png');
+  background-size: 70%;
+  background-position: center;
+  background-repeat: no-repeat;
+  border: 2px dashed #777;
+  border-radius: 10px;
+  box-shadow: inset 0 0 4px rgba(255,255,255,0.1);
+  font-size: 20px;
+  color: #aaa;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+.card-slot:hover {
+  border-color: #00ffc8;
+  box-shadow: 0 0 5px #00ffc8;
 }
 </style>
 </head>
