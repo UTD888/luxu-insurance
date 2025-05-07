@@ -248,6 +248,17 @@
   max-width: 1000px;
   width: 100%;
 }
+
+.card-tabs button[data-suit="spades"],
+.card-tabs button[data-suit="clubs"] {
+  color: black;
+  background-color: #ddd;
+}
+.card-tabs button[data-suit="hearts"],
+.card-tabs button[data-suit="diamonds"] {
+  color: red;
+  background-color: #fdd;
+}
 </style>
 </head>
 <body>
@@ -369,10 +380,10 @@ window.onload = () => {
 <div class="popup" id="cardPicker">
 <div class="popup-inner">
 <div class="card-tabs">
-<button onclick="showTab('spades')">♠</button>
-<button onclick="showTab('hearts')">♥</button>
-<button onclick="showTab('diamonds')">♦</button>
-<button onclick="showTab('clubs')">♣</button>
+<button data-suit="spades" onclick="showTab('spades')">♠</button>
+<button data-suit="hearts" onclick="showTab('hearts')">♥</button>
+<button data-suit="diamonds" onclick="showTab('diamonds')">♦</button>
+<button data-suit="clubs" onclick="showTab('clubs')">♣</button>
 <button class="close-popup" onclick="closePopup()">✕</button>
 </div>
 <div class="popup-grid" id="cardOptions"></div>
