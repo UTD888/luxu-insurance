@@ -279,7 +279,7 @@
   box-shadow: 0 0 5px #00ffc8;
 }
 </style>
-<script src="https://cdn.jsdelivr.net/gh/cheatcode/poker-evaluator@master/dist/poker-evaluator.min.js"></script></head>
+</head>
 <body><button onclick="resetAllCards()" style="margin: 20px auto; display: block; padding: 8px 16px; font-size: 16px; border-radius: 6px; background: #800; color: white; border: none; cursor: pointer;">🗑️ Reset All Cards</button>
 <div id="resultsBox" style="margin: 30px auto; max-width: 600px; background: #111; border: 2px solid #444; border-radius: 12px; padding: 20px; color: #fff; text-align: center; font-family: sans-serif; box-shadow: 0 2px 8px rgba(0,0,0,0.6);">
 <h2 style="margin-top: 0;">🧠 Calculation Result</h2>
@@ -494,16 +494,75 @@ window.onload = () => {
 </div>
 </div>
 <script>
+
 function convertCard(cardKey) {
-  const rankMap = { "2":"2","3":"3","4":"4","5":"5","6":"6","7":"7","8":"8","9":"9","10":"T","jack":"J","queen":"Q","king":"K","ace":"A" };
-  const suitMap = { "spades":"s","hearts":"h","diamonds":"d","clubs":"c" };
+  const rankMap = {
+    "2": "2", "3": "3", "4": "4", "5": "5", "6": "6",
+    "7": "7", "8": "8", "9": "9", "10": "T",
+    "jack": "J", "queen": "Q", "king": "K", "ace": "A"
+  };
+  const suitMap = {
+    "spades": "s", "hearts": "h", "diamonds": "d", "clubs": "c"
+  };
   const parts = cardKey.split("_of_");
   return rankMap[parts[0]] + suitMap[parts[1]];
 }
 
+function cardValue(card) {
+  const v = card.slice(0, -1);
+  const map = { "2":2,"3":3,"4":4,"5":5,"6":6,"7":7,"8":8,"9":9,"T":10,"J":11,"Q":12,"K":13,"A":14 };
+  return map[v.toUpperCase()];
+}
+
+function cardSuit(card) {
+  return card.slice(-1);
+}
+
+function countDuplicates(arr) {
+  const counts = {};
+  arr.forEach(v => counts[v] = (counts[v] || 0) + 1);
+  return counts;
+}
+
+function hasCount(counts, target) {
+  return Object.values(counts).includes(target);
+}
+
+function countPairs(counts) {
+  return Object.values(counts).filter(c => c === 2).length;
+}
+
+function checkStraight(values) {
+  const sorted = [...new Set(values)].sort((a, b) => a - b);
+  for (let i = 0; i <= sorted.length - 5; i++) {
+    if (sorted[i + 4] - sorted[i] === 4) return true;
+  }
+  if (sorted.includes(14) && sorted.slice(0, 4).toString() === "2,3,4,5") return true;
+  return false;
+}
+
+function evaluateHand(cards) {
+  const values = cards.map(cardValue);
+  const suits = cards.map(cardSuit);
+  const valueCounts = countDuplicates(values);
+
+  const isFlush = suits.every(s => s === suits[0]);
+  const isStraight = checkStraight(values);
+
+  if (isFlush && isStraight && Math.min(...values) === 10) return { rank: 10, name: "Royal Flush" };
+  if (isFlush && isStraight) return { rank: 9, name: "Straight Flush" };
+  if (hasCount(valueCounts, 4)) return { rank: 8, name: "Quads" };
+  if (hasCount(valueCounts, 3) && hasCount(valueCounts, 2)) return { rank: 7, name: "Full House" };
+  if (isFlush) return { rank: 6, name: "Flush" };
+  if (isStraight) return { rank: 5, name: "Straight" };
+  if (hasCount(valueCounts, 3)) return { rank: 4, name: "Three of a Kind" };
+  if (countPairs(valueCounts) === 2) return { rank: 3, name: "Two Pair" };
+  if (countPairs(valueCounts) === 1) return { rank: 2, name: "One Pair" };
+  return { rank: 1, name: "High Card" };
+}
+
 function calculateOutsAndRate() {
   const used = getAllUsedCards();
-  console.log("Used cards:", used);
   if (used.length < 3 + (2 * 2)) {
     document.getElementById("outsResult").innerText = "-";
     document.getElementById("rateResult").innerText = "-";
@@ -520,9 +579,6 @@ function calculateOutsAndRate() {
     }
   });
 
-  console.log("Player cards:", playerCards);
-  console.log("Board:", board);
-
   if (playerCards.length < 2) return;
 
   const deck = getRemainingDeck(used);
@@ -531,14 +587,15 @@ function calculateOutsAndRate() {
   deck.forEach(testCard => {
     const testBoard = [...board, testCard];
     const boardConverted = testBoard.map(convertCard);
-    const handScores = playerCards.map(p => {
+
+    const handRanks = playerCards.map(p => {
       const holeCards = p.map(convertCard);
       const fullHand = holeCards.concat(boardConverted);
-      const result = window.PokerEvaluator.evalHand(fullHand);
-      return result.value;
+      return evaluateHand(fullHand).rank;
     });
-    const minScore = Math.min(...handScores);
-    const winnerIndex = handScores.indexOf(minScore);
+
+    const bestRank = Math.min(...handRanks);
+    const winnerIndex = handRanks.indexOf(bestRank);
     if (winnerIndex !== 0) outs++;
   });
 
@@ -553,7 +610,6 @@ function calculateOutsAndRate() {
   document.getElementById("rateResult").innerText = rate;
 }
 
-// รันทันทีเมื่อมีการเลือกไพ่
 document.addEventListener("DOMContentLoaded", () => {
   document.querySelectorAll(".card-slot").forEach(slot => {
     slot.addEventListener("click", () => setTimeout(calculateOutsAndRate, 250));
