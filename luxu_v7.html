@@ -324,5 +324,81 @@ window.onload = () => {
 }
 </script>
 
+
+<script>
+let playerCount = 2;
+
+function renderPlayers() {
+  const container = document.getElementById('player-area');
+  container.innerHTML = '';
+  for (let i = 1; i <= playerCount; i += 2) {
+    const row = document.createElement('div');
+    row.className = 'player-row';
+
+    for (let j = i; j <= Math.min(i + 1, playerCount); j++) {
+      const box = document.createElement('div');
+      box.className = 'player-box';
+      box.innerHTML = `
+        <div><strong>P${j}</strong></div>
+        <div class="player-card-row">
+          <div class="player-card" id="p${j}c1"></div>
+          <div class="player-card" id="p${j}c2"></div>
+        </div>
+      `;
+      row.appendChild(box);
+    }
+
+    container.appendChild(row);
+  }
+
+  // add click listeners for all new cards
+  setTimeout(() => {
+    document.querySelectorAll('.player-card').forEach(slot => {
+      slot.addEventListener('click', () => {
+        openCardPicker(slot.id);
+      });
+    });
+    loadAllCards(); // reload values into new slots if needed
+  }, 10);
+}
+
+document.getElementById('add-player').addEventListener('click', () => {
+  if (playerCount >= 9) return;
+  playerCount++;
+  renderPlayers();
+  savePlayerCount();
+});
+
+document.getElementById('remove-player').addEventListener('click', () => {
+  if (playerCount <= 2) return;
+  // remove cards of last player from savedCards
+  const card1 = `p${playerCount}c1`;
+  const card2 = `p${playerCount}c2`;
+  const data = JSON.parse(localStorage.getItem('savedCards') || '{}');
+  delete data[card1];
+  delete data[card2];
+  localStorage.setItem('savedCards', JSON.stringify(data));
+  playerCount--;
+  renderPlayers();
+  savePlayerCount();
+});
+
+function savePlayerCount() {
+  localStorage.setItem('playerCount', playerCount);
+}
+
+function loadPlayerCount() {
+  const saved = localStorage.getItem('playerCount');
+  if (saved) {
+    playerCount = parseInt(saved);
+  }
+}
+
+window.onload = () => {
+  loadPlayerCount();
+  renderPlayers();
+};
+</script>
+
 </body>
 </html>
