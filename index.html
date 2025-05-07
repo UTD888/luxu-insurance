@@ -85,7 +85,6 @@
       z-index: 1000;
     }
 
-    .popup-inner {
       background: #2c2c2c;
       padding: 20px;
       border-radius: 10px;
@@ -194,7 +193,6 @@
   align-items: center;
   z-index: 9999;
 }
-.popup-inner {
   background: #222;
   padding: 20px;
   border-radius: 12px;
@@ -221,17 +219,34 @@
   max-width: 40px;
   background: #800;
 }
-.popup-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(65px, 1fr));
   gap: 8px;
   justify-content: center;
+}
+  width: 65px;
+  height: 95px;
+  cursor: pointer;
+  border-radius: 4px;
+}
+.popup-grid {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  justify-content: center;
+  gap: 8px;
+  overflow: hidden;
+  padding: 10px 0;
 }
 .popup-grid img {
   width: 65px;
   height: 95px;
   cursor: pointer;
   border-radius: 4px;
+}
+.popup-inner {
+  max-width: 1000px;
+  width: 100%;
 }
 </style>
 </head>
@@ -262,7 +277,6 @@
 </div>
 </div>
 <!-- Popup: Card Picker -->
-
 <script>
 let usedCards = new Set();
 let maxHands = 9;
