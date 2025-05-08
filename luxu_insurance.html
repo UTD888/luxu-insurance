@@ -130,6 +130,24 @@
     let currentSlot = null;
     const usedCards = new Set();
 
+    function mapToFilename(rank, suit) {
+      const suitNames = {
+        s: 'spades',
+        h: 'hearts',
+        d: 'diamonds',
+        c: 'clubs'
+      };
+      const faces = {
+        'A': 'ace',
+        'K': 'king',
+        'Q': 'queen',
+        'J': 'jack',
+        'T': '10'
+      };
+      const rankName = faces[rank] || rank;
+      return `${rankName}_of_${suitNames[suit]}.svg`;
+    }
+
     document.querySelectorAll('.card').forEach(c => {
       c.onclick = () => {
         currentSlot = c;
@@ -152,9 +170,10 @@
       const grid = document.getElementById('popupGrid');
       grid.innerHTML = '';
       for (let rank of ranks) {
+        const filename = mapToFilename(rank, suit);
         const code = rank + suit;
         const img = document.createElement('img');
-        img.src = svgBase + code + '.svg';
+        img.src = svgBase + filename;
         const div = document.createElement('div');
         div.className = 'popup-card';
         div.appendChild(img);
@@ -169,7 +188,7 @@
               usedCards.add(code);
               currentSlot.innerHTML = '';
               const newImg = document.createElement('img');
-              newImg.src = svgBase + code + '.svg';
+              newImg.src = svgBase + filename;
               currentSlot.appendChild(newImg);
               currentSlot.dataset.card = code;
               closePicker();
