@@ -41,6 +41,16 @@
       margin: 4px;
     }
     .card-slot.active, .player-card.active {
+      /* original active style */
+    }
+    .card-slot.has-card, .player-card.has-card {
+      border: none;
+      transform: scale(1.2);
+      z-index: 5;
+    }
+    .card-slot, .player-card {
+      transition: transform 0.2s ease;
+    }
       border: 2px solid #0d6efd;
     }
     .player-box {
@@ -241,6 +251,7 @@
               if (old) selectedCards.forEach((v, k) => { if (v === old) selectedCards.delete(k); });
               selectedCards.set(activeElement.id, name);
               activeElement.style.backgroundImage = card.style.backgroundImage;
+activeElement.classList.add('has-card');
               closePopup();
             }
           };
@@ -264,6 +275,7 @@
       selectedCards.clear();
       document.querySelectorAll(".card-slot, .player-card").forEach(card => {
         card.style.backgroundImage = "url('https://raw.githubusercontent.com/UTD888/luxu-insurance/8b7891c71e3f2ac6cffb9545bed9ba6c2f7c2159/svg-cards/back.svg')";
+card.classList.remove('has-card');
       });
     }
   </script>
