@@ -4,9 +4,10 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Luxu Insurance - SVG Card Picker</title>
+  <title>Luxu Insurance</title>
   <style>
     body {
+      margin: 0;
       background: #000;
       color: #fff;
       font-family: sans-serif;
@@ -17,187 +18,246 @@
       color: #ffd700;
       font-size: 28px;
       text-shadow: 0 0 10px #ffd700;
+      margin-bottom: 10px;
+    }
+    .reset-btn {
+      background: #c00;
+      color: white;
+      padding: 10px 20px;
+      font-size: 16px;
+      border: none;
+      border-radius: 6px;
+      margin-bottom: 20px;
+      box-shadow: 0 0 5px #00f;
+    }
+    .board-cards {
+      display: flex;
+      justify-content: center;
+      gap: 8px;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
     }
     .card {
       width: 60px;
       height: 90px;
-      border: 2px dashed #ffd700;
       background: #111;
+      border: 2px dashed #ffd700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #888;
+      font-size: 14px;
+      cursor: pointer;
+    }
+    .card.selected {
+      border-style: solid;
+      color: #fff;
+      font-weight: bold;
+    }
+    .players {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+    .player {
+      display: flex;
+      flex-direction: row;
+      gap: 8px;
+    }
+    .player .card {
+      border: 2px solid #ffd700;
+    }
+    .controls {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+    .controls button {
+      background: #333;
+      color: white;
+      border: 1px solid #999;
+      border-radius: 4px;
+      padding: 8px 16px;
+      font-size: 14px;
+    }
+    .results {
+      background: #111;
+      border: 2px solid #ffd700;
+      padding: 12px;
+      border-radius: 10px;
+      font-size: 16px;
+      width: 90%;
+      max-width: 400px;
+      margin: 0 auto;
+    }
+    #popup {
+      position: fixed;
+      top: 10%;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #111;
+      border: 2px solid #ffd700;
+      padding: 10px;
+      display: none;
+      flex-wrap: wrap;
+      max-width: 300px;
+      z-index: 1000;
+      justify-content: center;
+    }
+    .popup-card {
+      width: 40px;
+      height: 60px;
+      margin: 4px;
+      font-size: 14px;
+      background: #333;
+      border-radius: 4px;
+      color: white;
       display: flex;
       align-items: center;
       justify-content: center;
       cursor: pointer;
     }
-    .card img {
-      max-width: 100%;
-      max-height: 100%;
+    .popup-card.used {
+      background: #555;
+      opacity: 0.3;
+      pointer-events: none;
     }
-    .player, .board-cards {
-      display: flex;
-      justify-content: center;
-      flex-wrap: wrap;
-      gap: 8px;
-      margin-bottom: 16px;
-    }
-    .controls {
-      margin: 10px 0;
-    }
-    .popup {
-      position: fixed;
-      top: 10%;
-      left: 50%;
-      transform: translateX(-50%);
-      background: #222;
-      padding: 10px;
-      border-radius: 10px;
+    #overlay {
       display: none;
-      z-index: 1001;
-    }
-    .popup-tabs {
-      display: flex;
-      justify-content: center;
-      margin-bottom: 10px;
-      gap: 10px;
-    }
-    .popup-tabs button {
-      padding: 6px 12px;
-      border: none;
-      border-radius: 4px;
-      background: #444;
-      color: white;
-      cursor: pointer;
-    }
-    .popup-grid {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 6px;
-    }
-    .popup-card {
-      background: #000;
-      border-radius: 4px;
-      cursor: pointer;
-    }
-    .popup-card img {
-      width: 100%;
-      height: auto;
-    }
-    .overlay {
       position: fixed;
       top: 0; left: 0;
-      width: 100vw; height: 100vh;
-      background: rgba(0,0,0,0.6);
-      z-index: 1000;
-      display: none;
+      width: 100%; height: 100%;
+      background: rgba(0, 0, 0, 0.5);
+      z-index: 900;
     }
   </style>
 </head>
 <body>
   <h1>Luxu Insurance</h1>
+  <button class="reset-btn" onclick="resetAll()">Reset All</button>
 
   <div class="board-cards" id="board">
-    <div class="card" data-slot="Flop1"></div>
-    <div class="card" data-slot="Flop2"></div>
-    <div class="card" data-slot="Flop3"></div>
-    <div class="card" data-slot="Turn"></div>
+    <div class="card" data-type="board">Flop</div>
+    <div class="card" data-type="board">Flop</div>
+    <div class="card" data-type="board">Flop</div>
+    <div class="card" data-type="board">Turn</div>
   </div>
 
-  <div class="player" id="players">
-    <div class="card" data-slot="P1C1"></div>
-    <div class="card" data-slot="P1C2"></div>
-    <div class="card" data-slot="P2C1"></div>
-    <div class="card" data-slot="P2C2"></div>
+  <div class="players" id="players">
+    <div class="player" id="player-1">
+      <div class="card" data-type="player"></div>
+      <div class="card" data-type="player"></div>
+    </div>
+    <div class="player" id="player-2">
+      <div class="card" data-type="player"></div>
+      <div class="card" data-type="player"></div>
+    </div>
   </div>
 
   <div class="controls">
-    <button onclick="openPicker()">Open Picker</button>
+    <button onclick="addPlayer()">+ Hand</button>
+    <button onclick="removePlayer()">- Hand</button>
   </div>
 
-  <div class="overlay" id="overlay" onclick="closePicker()"></div>
-  <div class="popup" id="popup">
-    <div class="popup-tabs">
-      <button onclick="showSuit('s')">♠</button>
-      <button onclick="showSuit('h')">♥</button>
-      <button onclick="showSuit('d')">♦</button>
-      <button onclick="showSuit('c')">♣</button>
-    </div>
-    <div class="popup-grid" id="popupGrid"></div>
+  <div class="results">
+    <strong>Insurance Results:</strong><br/>
+    Outs: -<br/>
+    Rate: -
   </div>
+
+  <div id="popup"></div>
+  <div id="overlay" onclick="closePopup()"></div>
 
   <script>
-    const svgBase = "https://raw.githubusercontent.com/UTD888/luxu-insurance/7bcf012e89261efbc5d8992db02a43626e77556a/svg-cards/";
-    const suits = ['s', 'h', 'd', 'c'];
-    const ranks = ['A','K','Q','J','T','9','8','7','6','5','4','3','2'];
-    let currentSlot = null;
+    const suits = ['h','d','c','s'];
+    const ranks = ['2','3','4','5','6','7','8','9','T','J','Q','K','A'];
     const usedCards = new Set();
+    let activeCard = null;
+    let playerCount = 2;
 
-    function mapToFilename(rank, suit) {
-      const suitNames = {
-        s: 'spades',
-        h: 'hearts',
-        d: 'diamonds',
-        c: 'clubs'
-      };
-      const faces = {
-        'A': 'ace',
-        'K': 'king',
-        'Q': 'queen',
-        'J': 'jack',
-        'T': '10'
-      };
-      const rankName = faces[rank] || rank;
-      return `${rankName}_of_${suitNames[suit]}.svg`;
+    function createCard() {
+      const card = document.createElement('div');
+      card.className = 'card';
+      card.dataset.type = 'player';
+      card.onclick = () => openPopup(card);
+      return card;
     }
 
-    document.querySelectorAll('.card').forEach(c => {
-      c.onclick = () => {
-        currentSlot = c;
-        openPicker();
-      };
-    });
-
-    function openPicker() {
-      document.getElementById('overlay').style.display = 'block';
-      document.getElementById('popup').style.display = 'block';
-      showSuit('s');
+    function addPlayer() {
+      if (playerCount >= 9) return;
+      playerCount++;
+      const player = document.createElement('div');
+      player.className = 'player';
+      player.id = 'player-' + playerCount;
+      player.appendChild(createCard());
+      player.appendChild(createCard());
+      document.getElementById('players').appendChild(player);
     }
 
-    function closePicker() {
-      document.getElementById('overlay').style.display = 'none';
-      document.getElementById('popup').style.display = 'none';
-    }
-
-    function showSuit(suit) {
-      const grid = document.getElementById('popupGrid');
-      grid.innerHTML = '';
-      for (let rank of ranks) {
-        const filename = mapToFilename(rank, suit);
-        const code = rank + suit;
-        const img = document.createElement('img');
-        img.src = svgBase + filename;
-        const div = document.createElement('div');
-        div.className = 'popup-card';
-        div.appendChild(img);
-        if (usedCards.has(code)) {
-          div.style.opacity = 0.2;
-          div.style.pointerEvents = 'none';
-        } else {
-          div.onclick = () => {
-            if (currentSlot) {
-              const prev = currentSlot.dataset.card;
-              if (prev) usedCards.delete(prev);
-              usedCards.add(code);
-              currentSlot.innerHTML = '';
-              const newImg = document.createElement('img');
-              newImg.src = svgBase + filename;
-              currentSlot.appendChild(newImg);
-              currentSlot.dataset.card = code;
-              closePicker();
-            }
-          };
-        }
-        grid.appendChild(div);
+    function removePlayer() {
+      if (playerCount <= 2) return;
+      const player = document.getElementById('player-' + playerCount);
+      if (player) {
+        player.querySelectorAll('.card').forEach(c => {
+          if (c.textContent) usedCards.delete(c.textContent);
+          c.textContent = '';
+          c.classList.remove('selected');
+        });
+        player.remove();
+        playerCount--;
       }
     }
+
+    function openPopup(card) {
+      activeCard = card;
+      const popup = document.getElementById('popup');
+      popup.innerHTML = '';
+      for (let s of suits) {
+        for (let r of ranks) {
+          const val = r + s;
+          const el = document.createElement('div');
+          el.className = 'popup-card';
+          el.textContent = val;
+          if (usedCards.has(val)) el.classList.add('used');
+          el.onclick = () => selectCard(val);
+          popup.appendChild(el);
+        }
+      }
+      popup.style.display = 'flex';
+      document.getElementById('overlay').style.display = 'block';
+    }
+
+    function closePopup() {
+      document.getElementById('popup').style.display = 'none';
+      document.getElementById('overlay').style.display = 'none';
+      activeCard = null;
+    }
+
+    function selectCard(val) {
+      if (!activeCard) return;
+      const old = activeCard.textContent;
+      if (old) usedCards.delete(old);
+      activeCard.textContent = val;
+      activeCard.classList.add('selected');
+      usedCards.add(val);
+      closePopup();
+    }
+
+    function resetAll() {
+      document.querySelectorAll('.card').forEach(c => {
+        c.textContent = c.dataset.type === 'board' ? c.textContent : '';
+        c.classList.remove('selected');
+      });
+      usedCards.clear();
+    }
+
+    // Bind all .card click initially
+    document.querySelectorAll('.card').forEach(card => {
+      card.onclick = () => openPopup(card);
+    });
   </script>
 </body>
 </html>
