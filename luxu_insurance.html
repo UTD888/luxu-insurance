@@ -1,0 +1,154 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Luxu Insurance</title>
+  <style>
+    body {
+      margin: 0;
+      background: #000;
+      color: #fff;
+      font-family: sans-serif;
+      text-align: center;
+      padding: 16px;
+    }
+    h1 {
+      color: #ffd700;
+      font-size: 28px;
+      text-shadow: 0 0 10px #ffd700;
+      margin-bottom: 10px;
+    }
+    .reset-btn {
+      background: #c00;
+      color: white;
+      padding: 10px 20px;
+      font-size: 16px;
+      border: none;
+      border-radius: 6px;
+      margin-bottom: 20px;
+      box-shadow: 0 0 5px #00f;
+    }
+    .board-cards {
+      display: flex;
+      justify-content: center;
+      gap: 8px;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+    }
+    .card {
+      width: 60px;
+      height: 90px;
+      background: #111;
+      border: 2px dashed #ffd700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #888;
+      font-size: 14px;
+    }
+    .players {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+    .player {
+      display: flex;
+      flex-direction: row;
+      gap: 8px;
+    }
+    .player .card {
+      border: 2px solid #ffd700;
+    }
+    .controls {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+    .controls button {
+      background: #333;
+      color: white;
+      border: 1px solid #999;
+      border-radius: 4px;
+      padding: 8px 16px;
+      font-size: 14px;
+    }
+    .results {
+      background: #111;
+      border: 2px solid #ffd700;
+      padding: 12px;
+      border-radius: 10px;
+      font-size: 16px;
+      width: 90%;
+      max-width: 400px;
+      margin: 0 auto;
+    }
+  </style>
+</head>
+<body>
+  <h1>Luxu Insurance</h1>
+  <button class="reset-btn">Reset All</button>
+
+  <div class="board-cards">
+    <div class="card">Flop</div>
+    <div class="card">Flop</div>
+    <div class="card">Flop</div>
+    <div class="card">Turn</div>
+  </div>
+
+  <div class="players" id="players">
+    <div class="player" id="player-1">
+      <div class="card"></div>
+      <div class="card"></div>
+    </div>
+    <div class="player" id="player-2">
+      <div class="card"></div>
+      <div class="card"></div>
+    </div>
+  </div>
+
+  <div class="controls">
+    <button onclick="addPlayer()">+ Hand</button>
+    <button onclick="removePlayer()">- Hand</button>
+  </div>
+
+  <div class="results">
+    <strong>Insurance Results:</strong><br/>
+    Outs: -<br/>
+    Rate: -
+  </div>
+
+  <script>
+    let playerCount = 2;
+
+    function createCard() {
+      const card = document.createElement('div');
+      card.className = 'card';
+      return card;
+    }
+
+    function addPlayer() {
+      if (playerCount >= 9) return;
+      playerCount++;
+      const players = document.getElementById('players');
+      const player = document.createElement('div');
+      player.className = 'player';
+      player.id = 'player-' + playerCount;
+      player.appendChild(createCard());
+      player.appendChild(createCard());
+      players.appendChild(player);
+    }
+
+    function removePlayer() {
+      if (playerCount <= 2) return;
+      const player = document.getElementById('player-' + playerCount);
+      if (player) player.remove();
+      playerCount--;
+    }
+  </script>
+</body>
+</html>
