@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
  <head>
@@ -29,7 +30,7 @@
       height: 90px;
       border: 2px solid #555;
       border-radius: 8px;
-      background: #333 url('https://raw.githubusercontent.com/UTD888/luxu-insurance/refs/heads/main/svg-cards/blank.svg') center/contain no-repeat;
+      background: #333 url('https://raw.githubusercontent.com/UTD888/luxu-insurance/2652b268f96e16e5b5debdcc644c099e240e779d/cardsset/blank.png') center/contain no-repeat;
       background-size: cover;
       cursor: pointer;
     }
@@ -50,12 +51,15 @@
       width: 50px;
       margin: 2px;
     }
+    
   </style>
  </head>
  <body>
+   
   <h1>
    Poker Outs Calculator
   </h1>
+  
   <h3>
    Player 1
   </h3>
@@ -64,6 +68,7 @@
    </div>
    <div class="card-slot" id="p1c2" onclick="selectCard(this)">
    </div>
+  </div>
   <h3>
    Player 2
   </h3>
@@ -72,8 +77,9 @@
    </div>
    <div class="card-slot" id="p2c2" onclick="selectCard(this)">
    </div>
+  
   </div>
-  </div>
+   
   <h3>
    Board Cards (3 or 4)
   </h3>
@@ -99,19 +105,7 @@
    </div>
   </div>
   <!-- Card Selection Popup -->
-  <div id="card-popup" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:#000a; z-index:999; justify-content:center; align-items:center;">
-   <div style="background:#222; padding:20px; border-radius:10px; max-width:90vw; max-height:90vh; overflow:auto;">
-    <div style="text-align:right;">
-     <button onclick="closePopup()" style="font-size:18px; background:none; border:none; color:white;">
-      ✖
-     </button>
-    </div>
-    <div id="card-grid" style="display:flex; flex-wrap:wrap; gap:5px; justify-content:center;">
-    </div>
-   </div>
-  </div>
-  <!-- Card Selection Popup -->
-  <div id="card-popup" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:#000a; z-index:999; justify-content:center; align-items:center;">
+<div id="card-popup" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:#000a; z-index:999; justify-content:center; align-items:center;">
    <div style="background:#222; padding:20px; border-radius:10px; max-width:90vw; max-height:90vh; overflow:auto;">
     <div style="text-align:right;">
      <button onclick="closePopup()" style="font-size:18px; background:none; border:none; color:white;">
@@ -128,11 +122,6 @@ const ranks = ['2','3','4','5','6','7','8','9','t','j','q','k','a'];
 const used = new Set();
 let selected = null;
 
-function selectCard(el) {
-  selected = el;
-  generateCardGrid();
-  document.getElementById("card-popup").style.display = "flex";
-}
 function closePopup() {
   document.getElementById("card-popup").style.display = "none";
 }
@@ -144,8 +133,8 @@ function generateCardGrid() {
       const code = r + s[0];
       if (used.has(code)) continue;
       const img = document.createElement("img");
-      const fname = `${r === 't' ? '10' : r}_of_${s}.svg`;
-      img.src = `https://raw.githubusercontent.com/UTD888/luxu-insurance/refs/heads/main/svg-cards/${fname}`;
+      const fname = `${code}.png`;
+      img.src = `https://raw.githubusercontent.com/UTD888/luxu-insurance/2652b268f96e16e5b5debdcc644c099e240e779d/cardsset/${fname}`;
       img.style.width = "50px";
       img.style.cursor = "pointer";
       img.onclick = () => chooseCard(code, img.src);
@@ -153,6 +142,7 @@ function generateCardGrid() {
     }
   }
 }
+    
 function chooseCard(code, img) {
   if (!selected) return;
   const prev = selected.getAttribute("data-code");
@@ -164,11 +154,7 @@ function chooseCard(code, img) {
   closePopup();
 }
 
-window.onload = () => {
-  document.querySelectorAll(".card-slot").forEach(el => {
-    el.addEventListener("click", () => selectCard(el));
-  });
-};
+
   
 function getCardCode(id) {
   const el = document.getElementById(id);
@@ -318,10 +304,8 @@ Object.entries(outs).reverse().forEach(([rank, cards]) => {
   totalOuts += cards.length;
   
     const imgs = cards.map(code => {
-      const s = { s:'spades', h:'hearts', d:'diamonds', c:'clubs' }[code[1]];
-      const r = { t:'10', j:'jack', q:'queen', k:'king', a:'ace' }[code[0]] || code[0];
-      return `<img src="https://raw.githubusercontent.com/UTD888/luxu-insurance/refs/heads/main/svg-cards/${r}_of_${s}.svg">`;
-    }).join('');
+  return `<img src="https://raw.githubusercontent.com/UTD888/luxu-insurance/2652b268f96e16e5b5debdcc644c099e240e779d/cardsset/${code}.png">`;
+}).join('');
     html += `<div class="outs-group"><h3>${rank} (${cards.length} outs)</h3><div class="outs-cards">${imgs}</div></div>`;
   
 });
@@ -331,6 +315,12 @@ Object.entries(outs).reverse().forEach(([rank, cards]) => {
   outDiv.innerHTML = `<div style="margin-bottom:5px;"><strong>Outs for ${who}</strong></div><div style="margin-bottom:10px;"><strong>${totalOuts} Outs</strong> &nbsp;|&nbsp; <strong>Rate:</strong> ${rate}</div>` + html;
 
 }
-  </script>
+  
+function selectCard(el) {
+  selected = el;
+  document.getElementById("card-popup").style.display = "flex";
+  generateCardGrid();
+}
+</script>
  </body>
 </html>
