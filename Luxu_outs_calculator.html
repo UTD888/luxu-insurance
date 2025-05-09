@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="en">
+ <head>
+  <meta charset="utf-8"/>
+  <title>
+   Poker Outs - Exact Logic
+  </title>
+  <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+  <style>
+   body {
+      background: #111;
+      color: #fff;
+      font-family: Arial, sans-serif;
+      text-align: center;
+      padding: 20px;
+    }
+    h1 {
+      color: gold;
+    }
+    .card-row {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      margin: 10px 0;
+      flex-wrap: wrap;
+    }
+    .card-slot {
+      width: 60px;
+      height: 90px;
+      border: 2px solid #555;
+      border-radius: 8px;
+      background: #333 url('https://raw.githubusercontent.com/UTD888/luxu-insurance/refs/heads/main/svg-cards/blank.svg') center/contain no-repeat;
+      background-size: cover;
+      cursor: pointer;
+    }
+    #outs-display {
+      margin-top: 20px;
+      background: #222;
+      border-radius: 10px;
+      padding: 10px;
+    }
+    .outs-group {
+      margin-bottom: 15px;
+    }
+    .outs-group h3 {
+      margin-bottom: 5px;
+      color: cyan;
+    }
+    .outs-cards img {
+      width: 50px;
+      margin: 2px;
+    }
+  </style>
+ </head>
+ <body>
+  <h1>
+   Poker Outs Calculator
+  </h1>
+  <h3>
+   Player 1
+  </h3>
+  <div class="card-row">
+   <div class="card-slot" id="p1c1" onclick="selectCard(this)">
+   </div>
+   <div class="card-slot" id="p1c2" onclick="selectCard(this)">
+   </div>
+  </div>
+  <h3>
+   Player 2
+  </h3>
+  <div class="card-row">
+   <div class="card-slot" id="p2c1" onclick="selectCard(this)">
+   </div>
+   <div class="card-slot" id="p2c2" onclick="selectCard(this)">
+   </div>
+  </div>
+  <h3>
+   Board Cards (3 or 4)
+  </h3>
+  <div class="card-row">
+   <div class="card-slot" id="b1" onclick="selectCard(this)">
+   </div>
+   <div class="card-slot" id="b2" onclick="selectCard(this)">
+   </div>
+   <div class="card-slot" id="b3" onclick="selectCard(this)">
+   </div>
+   <div class="card-slot" id="b4" onclick="selectCard(this)">
+   </div>
+  </div>
+  <button onclick="calculateOuts()" style="padding: 10px 20px; font-weight: bold; margin-top: 20px;">
+   Calculate OUTs
+  </button>
+  <div id="outs-display">
+   <h2>
+    OUTs Result
+   </h2>
+   <div id="outs-result">
+    Please select cards and press Calculate OUTs
+   </div>
+  </div>
+  <!-- Card Selection Popup -->
+  <div id="card-popup" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:#000a; z-index:999; justify-content:center; align-items:center;">
+   <div style="background:#222; padding:20px; border-radius:10px; max-width:90vw; max-height:90vh; overflow:auto;">
+    <div style="text-align:right;">
+     <button onclick="closePopup()" style="font-size:18px; background:none; border:none; color:white;">
+      ✖
+     </button>
+    </div>
+    <div id="card-grid" style="display:flex; flex-wrap:wrap; gap:5px; justify-content:center;">
+    </div>
+   </div>
+  </div>
+  <!-- Card Selection Popup -->
+  <div id="card-popup" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:#000a; z-index:999; justify-content:center; align-items:center;">
+   <div style="background:#222; padding:20px; border-radius:10px; max-width:90vw; max-height:90vh; overflow:auto;">
+    <div style="text-align:right;">
+     <button onclick="closePopup()" style="font-size:18px; background:none; border:none; color:white;">
+      ✖
+     </button>
+    </div>
+    <div id="card-grid" style="display:flex; flex-wrap:wrap; gap:5px; justify-content:center;">
+    </div>
+   </div>
+  </div>
+  <script>
+   const suits = ['spades', 'hearts', 'diamonds', 'clubs'];
+const ranks = ['2','3','4','5','6','7','8','9','t','j','q','k','a'];
+const used = new Set();
+let selected = null;
+
+function selectCard(el) {
+  selected = el;
+  generateCardGrid();
+  document.getElementById("card-popup").style.display = "flex";
+}
+function closePopup() {
+  document.getElementById("card-popup").style.display = "none";
+}
+function generateCardGrid() {
+  const grid = document.getElementById("card-grid");
+  grid.innerHTML = "";
+  for (let s of suits) {
+    for (let r of ranks) {
+      const code = r + s[0];
+      if (used.has(code)) continue;
+      const img = document.createElement("img");
+      const fname = `${r === 't' ? '10' : r}_of_${s}.svg`;
+      img.src = `https://raw.githubusercontent.com/UTD888/luxu-insurance/refs/heads/main/svg-cards/${fname}`;
+      img.style.width = "50px";
+      img.style.cursor = "pointer";
+      img.onclick = () => chooseCard(code, img.src);
+      grid.appendChild(img);
+    }
+  }
+}
+function chooseCard(code, img) {
+  if (!selected) return;
+  const prev = selected.getAttribute("data-code");
+  if (prev) used.delete(prev);
+  selected.setAttribute("data-code", code);
+  selected.style.backgroundImage = `url(${img})`;
+  used.add(code);
+  selected = null;
+  closePopup();
+}
+
+window.onload = () => {
+  document.querySelectorAll(".card-slot").forEach(el => {
+    el.addEventListener("click", () => selectCard(el));
+  });
+};
+  
+function getCardCode(id) {
+  const el = document.getElementById(id);
+  return el ? el.getAttribute("data-code") : null;
+}
+
+function getAllCards() {
+  return ranks.flatMap(r => suits.map(s => r + s[0]));
+}
+
+function evaluateHand(cards7) {
+  const rankOrder = '23456789tjqka';
+  const rv = r => rankOrder.indexOf(r);
+  const comb = (arr, k) => k === 0 ? [[]] : arr.length < k ? [] :
+    comb(arr.slice(1), k - 1).map(c => [arr[0], ...c]).concat(comb(arr.slice(1), k));
+  const best5 = comb(cards7, 5);
+
+  function score(hand) {
+    const count = {}, suit = {}, vals = hand.map(c => rv(c[0]));
+    hand.forEach(c => {
+      count[c[0]] = (count[c[0]] || 0) + 1;
+      suit[c[1]] = (suit[c[1]] || []).concat(c);
+    });
+    const flush = Object.values(suit).find(a => a.length >= 5);
+    const uniq = [...new Set(vals)].sort((a, b) => b - a);
+    if (uniq.includes(12)) uniq.push(-1);
+    let straight = null;
+    for (let i = 0; i <= uniq.length - 5; i++) {
+      if (uniq[i] - uniq[i + 4] === 4) straight = uniq[i];
+    }
+    if (flush) {
+      const fvals = flush.map(c => rv(c[0])).sort((a, b) => b - a);
+      for (let i = 0; i <= fvals.length - 5; i++) {
+        if (fvals[i] - fvals[i + 4] === 4)
+          return { rank: 8, kickers: [fvals[i]] };
+      }
+    }
+    const entries = Object.entries(count).sort((a, b) =>
+      b[1] - a[1] || rv(b[0]) - rv(a[0]));
+    if (entries[0][1] === 4)
+      return { rank: 7, kickers: [rv(entries[0][0]), ...vals.filter(v => v !== rv(entries[0][0])).slice(0, 1)] };
+    if (entries[0][1] === 3 && entries[1] && entries[1][1] >= 2)
+      return { rank: 6, kickers: [rv(entries[0][0]), rv(entries[1][0])] };
+    if (flush) return { rank: 5, kickers: flush.slice(0, 5) };
+    if (straight !== null) return { rank: 4, kickers: [straight] };
+    if (entries[0][1] === 3)
+      return {
+        rank: 3,
+        kickers: [rv(entries[0][0]), ...vals.filter(v => v !== rv(entries[0][0])).slice(0, 2)]
+      };
+    if (entries[0][1] === 2 && entries[1] && entries[1][1] === 2)
+      return {
+        rank: 2,
+        kickers: [rv(entries[0][0]), rv(entries[1][0]), ...vals.filter(v => v !== rv(entries[0][0]) && v !== rv(entries[1][0])).slice(0, 1)]
+      };
+    if (entries[0][1] === 2)
+      return {
+        rank: 1,
+        kickers: [rv(entries[0][0]), ...vals.filter(v => v !== rv(entries[0][0])).slice(0, 3)]
+      };
+    return { rank: 0, kickers: vals.sort((a, b) => b - a).slice(0, 5) };
+  }
+
+  let best = score(best5[0]);
+  for (let h of best5.slice(1)) {
+    const s = score(h);
+    const cmp = compareHands(s, best);
+    if (cmp > 0) best = s;
+  }
+  return best;
+}
+
+function compareHands(a, b) {
+  if (a.rank !== b.rank) return a.rank - b.rank;
+  for (let i = 0; i < Math.max(a.kickers.length, b.kickers.length); i++) {
+    const va = a.kickers[i] || -1;
+    const vb = b.kickers[i] || -1;
+    if (va !== vb) return va - vb;
+  }
+  return 0;
+}
+
+function calculateOuts() {
+  const ids = ['p1c1','p1c2','p2c1','p2c2','b1','b2','b3'];
+  const cardMap = Object.fromEntries(ids.map(id => [id, getCardCode(id)]));
+  const opt = getCardCode('b4'); if (opt) cardMap.b4 = opt;
+  if (Object.values(cardMap).some(v => !v)) {
+    document.getElementById("outs-result").innerHTML = "⛔ Fill all required cards.";
+    return;
+  }
+  const p1 = [cardMap.p1c1, cardMap.p1c2];
+  const p2 = [cardMap.p2c1, cardMap.p2c2];
+  const board = ['b1','b2','b3','b4'].map(getCardCode).filter(Boolean);
+
+  const used = [...p1, ...p2, ...board];
+  const deck = getAllCards().filter(c => !used.includes(c));
+  const rankNames = ['High Card','One Pair','Two Pair','Trips','Straight','Flush','Full House','Quads','Straight Flush'];
+  const outs = {};
+
+  const base1 = evaluateHand([...p1, ...board]);
+  const base2 = evaluateHand([...p2, ...board]);
+  const behind = compareHands(base1, base2) < 0 ? 'p1' : (compareHands(base2, base1) < 0 ? 'p2' : null);
+  if (!behind) {
+    document.getElementById("outs-result").innerHTML = "Tie game. No one behind.";
+    return;
+  }
+
+  for (let c of deck) {
+    const newBoard = [...board, c];
+    const h1 = evaluateHand([...p1, ...newBoard]);
+    const h2 = evaluateHand([...p2, ...newBoard]);
+    const cmp = compareHands(h1, h2);
+    if (behind === 'p1' && cmp > 0) {
+      const rname = rankNames[h1.rank];
+      if (!outs[rname]) outs[rname] = [];
+      outs[rname].push(c);
+    }
+    if (behind === 'p2' && cmp < 0) {
+      const rname = rankNames[h2.rank];
+      if (!outs[rname]) outs[rname] = [];
+      outs[rname].push(c);
+    }
+  }
+
+  const outDiv = document.getElementById("outs-result");
+  
+  if (Object.keys(outs).length === 0) {
+    document.getElementById("outs-result").innerHTML = "❌ No outs found.";
+    return;
+  }
+
+  const who = behind === 'p1' ? "Player 1" : "Player 2";
+
+
+  
+  
+  const rateMap = {
+    1: 30, 2: 15, 3: 10, 4: 8, 5: 6, 6: 5,
+    7: 4, 8: 3.5, 9: 3, 10: 2.5, 11: 2.2, 12: 2
+  };
+
+  let totalOuts = 0;
+  let html = "";
+
+  
+Object.entries(outs).reverse().forEach(([rank, cards]) => {
+  totalOuts += cards.length;
+  
+    const imgs = cards.map(code => {
+      const s = { s:'spades', h:'hearts', d:'diamonds', c:'clubs' }[code[1]];
+      const r = { t:'10', j:'jack', q:'queen', k:'king', a:'ace' }[code[0]] || code[0];
+      return `<img src="https://raw.githubusercontent.com/UTD888/luxu-insurance/refs/heads/main/svg-cards/${r}_of_${s}.svg">`;
+    }).join('');
+    html += `<div class="outs-group"><h3>${rank} (${cards.length} outs)</h3><div class="outs-cards">${imgs}</div></div>`;
+  
+});
+
+  
+  const rate = rateMap[totalOuts] !== undefined ? rateMap[totalOuts] + "x" : "?%";
+  outDiv.innerHTML = `<div style="margin-bottom:5px;"><strong>Outs for ${who}</strong></div><div style="margin-bottom:10px;"><strong>${totalOuts} Outs</strong> &nbsp;|&nbsp; <strong>Rate:</strong> ${rate}</div>` + html;
+
+}
+  </script>
+ </body>
+</html>
