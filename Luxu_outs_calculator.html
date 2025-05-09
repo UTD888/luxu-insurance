@@ -265,7 +265,7 @@ function calculateOuts() {
 
   const used = [...p1, ...p2, ...board];
   const deck = getAllCards().filter(c => !used.includes(c));
-  const rankNames = ['High Card','One Pair','Two Pair','Trips','Straight','Flush','Full House','Quads','Straight Flush'];
+  const rankNames = ['High Card','One Pair','Two Pair','Trips','Straight','Flush','Full House','Quads','Straight Flush','Royal Flush'];
   const outs = {};
 
   const base1 = evaluateHand([...p1, ...board]);
