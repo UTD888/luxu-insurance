@@ -75,8 +75,21 @@
    
   <h1>
    Poker Outs Calculator
-  </h1>
-  
+  </h1>  
+   
+  <h3>
+   Board Cards (3 or 4)
+  </h3>
+  <div class="card-row">
+   <div class="card-slot" id="b1" onclick="selectCard(this)">
+   </div>
+   <div class="card-slot" id="b2" onclick="selectCard(this)">
+   </div>
+   <div class="card-slot" id="b3" onclick="selectCard(this)">
+   </div>
+   <div class="card-slot" id="b4" onclick="selectCard(this)">
+   </div>
+  </div>
   <div id="player-area">
   <div class="card-row" id="player-row">
     <div class="player-block" id="player1">
@@ -105,20 +118,6 @@
   </div>
   <button onclick="addPlayer()" style="margin-top: 10px;">+ Add Player</button>
 </div>
-   
-  <h3>
-   Board Cards (3 or 4)
-  </h3>
-  <div class="card-row">
-   <div class="card-slot" id="b1" onclick="selectCard(this)">
-   </div>
-   <div class="card-slot" id="b2" onclick="selectCard(this)">
-   </div>
-   <div class="card-slot" id="b3" onclick="selectCard(this)">
-   </div>
-   <div class="card-slot" id="b4" onclick="selectCard(this)">
-   </div>
-  </div>
   <button onclick="calculateOuts()" style="padding: 10px 20px; font-weight: bold; margin-top: 20px;">
    Calculate OUTs
   </button>
