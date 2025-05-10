@@ -1,4 +1,6 @@
 
+
+
 <!DOCTYPE html>
 <html lang="en">
  <head>
@@ -124,15 +126,23 @@
   </div>
   <!-- Card Selection Popup -->
 <div id="card-popup" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:#000a; z-index:999; justify-content:center; align-items:center;">
-   <div style="background:#222; padding:20px; border-radius:10px; max-width:90vw; max-height:90vh; overflow:auto;">
+  <div style="background:#222; padding:20px; border-radius:10px; max-width:95vw; max-height:90vh; overflow:auto;">
     <div style="text-align:right;">
-     <button onclick="closePopup()" style="font-size:18px; background:none; border:none; color:white;">
-      ✖
-     </button>
+      <button onclick="closePopup()" style="font-size:18px; background:none; border:none; color:white;">✖</button>
     </div>
-    <div id="card-grid" style="display:flex; flex-wrap:wrap; gap:5px; justify-content:center;">
+
+    <!-- Tabs -->
+    <div style="display:flex; justify-content:center; gap:10px; margin-bottom:10px;">
+      <button onclick="switchTab('spades')" style="padding:5px 10px;" id="tab-spades">♠ Spades</button>
+      <button onclick="switchTab('hearts')" style="padding:5px 10px;" id="tab-hearts">♥ Hearts</button>
+      <button onclick="switchTab('diamonds')" style="padding:5px 10px;" id="tab-diamonds">♦ Diamonds</button>
+      <button onclick="switchTab('clubs')" style="padding:5px 10px;" id="tab-clubs">♣ Clubs</button>
     </div>
-   </div>
+
+    <!-- Grid -->
+    <div id="card-grid" style="display:flex; flex-wrap:wrap; gap:5px; justify-content:center;"></div>
+  </div>
+</div>
   </div>
   <script>
    const suits = ['spades', 'hearts', 'diamonds', 'clubs'];
@@ -143,24 +153,33 @@ let selected = null;
 function closePopup() {
   document.getElementById("card-popup").style.display = "none";
 }
-function generateCardGrid() {
+function generateCardGrid(suit = 'spades') {
   const grid = document.getElementById("card-grid");
   grid.innerHTML = "";
-  for (let s of suits) {
-    for (let r of ranks) {
-      const code = r + s[0];
-      if (used.has(code)) continue;
-      const img = document.createElement("img");
-      const fname = `${code}.png`;
-      img.src = `https://raw.githubusercontent.com/UTD888/luxu-insurance/2652b268f96e16e5b5debdcc644c099e240e779d/cardsset/${fname}`;
-      img.style.width = "50px";
-      img.style.cursor = "pointer";
-      img.onclick = () => chooseCard(code, img.src);
-      grid.appendChild(img);
-    }
+  for (let r of ranks) {
+    const code = r + suit[0];
+    if (used.has(code)) continue;
+    const img = document.createElement("img");
+    const fname = `${code}.png`;
+    img.src = `https://raw.githubusercontent.com/UTD888/luxu-insurance/2652b268f96e16e5b5debdcc644c099e240e779d/cardsset/${fname}`;
+    img.style.width = "50px";
+    img.style.cursor = "pointer";
+    img.onclick = () => chooseCard(code, img.src);
+    grid.appendChild(img);
   }
 }
     
+function switchTab(suit) {
+  generateCardGrid(suit);
+  ['spades','hearts','diamonds','clubs'].forEach(s => {
+    const btn = document.getElementById(`tab-${s}`);
+    if (btn) {
+      btn.style.background = (s === suit) ? '#555' : '';
+      btn.style.color = (s === suit) ? 'white' : '';
+    }
+  });
+}
+
 function chooseCard(code, img) {
   if (!selected) return;
   const prev = selected.getAttribute("data-code");
@@ -339,7 +358,7 @@ Object.entries(outs).reverse().forEach(([rank, cards]) => {
 function selectCard(el) {
   selected = el;
   document.getElementById("card-popup").style.display = "flex";
-  generateCardGrid();
+  switchTab('spades');
 }
 
 function addPlayer() {
