@@ -1,6 +1,5 @@
 
 
-
 <!DOCTYPE html>
 <html lang="en">
  <head>
@@ -120,9 +119,7 @@
    <h2>
     OUTs Result
    </h2>
-   <div id="outs-result">
-    Please select cards and press Calculate OUTs
-   </div>
+   <div id="outs-result">Please select cards and press Calculate OUTs</div>
   </div>
   <!-- Card Selection Popup -->
 <div id="card-popup" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:#000a; z-index:999; justify-content:center; align-items:center;">
@@ -144,7 +141,10 @@
   </div>
 </div>
   </div>
-  <script>
+  
+ </body>
+</html>
+<script>
 const suits = ['spades', 'hearts', 'diamonds', 'clubs'];
 const ranks = ['2','3','4','5','6','7','8','9','t','j','q','k','a'];
 const used = new Set();
@@ -223,22 +223,31 @@ function evaluateHand(cards7) {
       suit[c[1]] = (suit[c[1]] || []).concat(c);
     });
 
-    const flushSuit = Object.entries(suit).find(([_, cards]) => cards.length >= 5);
-    if (flushSuit) {
-      const cards = flushSuit[1].slice().sort((a, b) => rv(b[0]) - rv(a[0]));
-      const flushRanks = cards.slice(0, 5).map(c => rv(c[0]));
-      return { rank: 5, kickers: flushRanks };
-    }
-
     const entries = Object.entries(count).sort((a, b) =>
       b[1] - a[1] || rv(b[0]) - rv(a[0]));
     const uniq = [...new Set(vals)].sort((a, b) => b - a);
     if (uniq.includes(12)) uniq.push(-1);
-    let straight = null;
-    for (let i = 0; i <= uniq.length - 5; i++) {
-      if (uniq[i] - uniq[i + 4] === 4) straight = uniq[i];
+
+    const flushSuit = Object.entries(suit).find(([_, cards]) => cards.length >= 5);
+    if (flushSuit) {
+      const flushCards = flushSuit[1].slice().sort((a, b) => rv(b[0]) - rv(a[0]));
+      const fvals = flushCards.map(c => rv(c[0]));
+      const flushUniq = [...new Set(fvals)];
+      if (flushUniq.includes(12)) flushUniq.push(-1);
+      for (let i = 0; i <= flushUniq.length - 5; i++) {
+        if (flushUniq[i] - flushUniq[i + 4] === 4) {
+          const high = flushUniq[i];
+          return { rank: high === 12 ? 9 : 8, kickers: [high] };
+        }
+      }
+      return { rank: 5, kickers: fvals.slice(0, 5) };
     }
-    if (straight !== null) return { rank: 4, kickers: [straight] };
+
+    for (let i = 0; i <= uniq.length - 5; i++) {
+      if (uniq[i] - uniq[i + 4] === 4)
+        return { rank: 4, kickers: [uniq[i]] };
+    }
+
     if (entries[0][1] === 4)
       return { rank: 7, kickers: [rv(entries[0][0]), ...vals.filter(v => v !== rv(entries[0][0])).slice(0, 1)] };
     if (entries[0][1] === 3 && entries[1] && entries[1][1] >= 2)
@@ -357,6 +366,5 @@ function addPlayer() {
     </div>`;
   container.appendChild(div);
 }
+
 </script>
- </body>
-</html>
