@@ -116,12 +116,12 @@ button:hover {
     <div class="card-slot" id="p2c2" onclick="selectCard(this)"></div>
   </div>
 </div>
-    
-<div style="width:80%;,display:block;">
+   </div>
+   <button onclick="addPlayer()" style="margin-top: 10px;">+ Add Player</button>
+  </div> 
   <button onclick="calculateOuts()" style="padding: 10px 20px; font-weight: bold; margin-top: 20px;">
    Calculate OUTs
   </button>
-</div>
   <div id="outs-display">
    <h2>
     OUTs Result
@@ -369,20 +369,5 @@ function calculateOuts() {
   outDiv.innerHTML = `<div style="margin-bottom:5px;"><strong>Outs for ${who}</strong></div><div style="margin-bottom:10px;"><strong>${totalOuts} Outs</strong> &nbsp;|&nbsp; <strong>Rate:</strong> ${rate}</div>` + html;
 }
 
-function addPlayer() {
-  const container = document.getElementById("player-row");
-  const count = container.querySelectorAll(".player-block").length + 1;
-  if (count > 9) return alert("Maximum 9 players");
-  const div = document.createElement("div");
-  div.className = "player-block";
-  div.id = `player${count}`;
-  div.innerHTML = `
-    <h3>Player ${count}</h3>
-    <div class='card-row'>
-      <div class='card-slot' id='p${count}c1' onclick='selectCard(this)'></div>
-      <div class='card-slot' id='p${count}c2' onclick='selectCard(this)'></div>
-    </div>`;
-  container.appendChild(div);
-}
 
 </script>
