@@ -26,7 +26,7 @@ h1 {
   display: flex;
   justify-content: center;
   flex-wrap: wrap;
-  gap: 8px;
+  gap: 15px;
   margin: 1rem 0;
 }
 .card-slot {
@@ -198,6 +198,9 @@ function chooseCard(code, img) {
   selected.setAttribute("data-code", code);
   selected.style.backgroundImage = 'url(' + img + ')';
   selected.style.border = "none";
+  selected.style.outline = "none";
+  selected.style.boxShadow = "none";
+  selected.style.border = "none";
   selected.style.transform = "scale(1.1)";
   selected.style.transition = "transform 0.2s ease";
   used.add(code);
@@ -207,10 +210,14 @@ function chooseCard(code, img) {
   closePopup();
 }
 
+
 function selectCard(el) {
+  if (selected) selected.style.outline = "none";
   selected = el;
+  selected.style.outline = "3px solid #3498db";
   document.getElementById("card-popup").style.display = "flex";
   switchTab('spades');
+
 }
 
 function getCardCode(id) {
