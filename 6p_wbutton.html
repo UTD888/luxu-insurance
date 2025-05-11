@@ -26,7 +26,7 @@ h1 {
   display: flex;
   justify-content: center;
   flex-wrap: wrap;
-  gap: 3px;
+  gap: 5px;
   margin: 1rem 0;
   margin-top: -7px;
 }
@@ -163,18 +163,18 @@ button:hover {
    LUXU INSURANCE
   </h1>
 <div style="margin: 10px auto; display: flex; justify-content: center; gap: 10px; align-items: center;">
-  <a href="index.html" style="text-decoration: none;"><button>🏠</button></a>
-  <button onclick="resetAll()">🗑 Reset</button>
+  <a href="#" style="text-decoration: none;"><button>🏠</button></a>
+  <button onclick="resetAll()">🗑 ล้างข้อมูล</button>
   <div style="position: relative; display: inline-block;">
     <button id="dropdownButton">➕ Add Hand</button>
     <div id="dropdownList" style="display: none; position: absolute; top: 100%; left: 0; background: #2c3e50; border-radius: 6px; text-align: left; min-width: 150px; z-index: 99;">
-      <a href="3p_wbutton.html" style="display: block; padding: 10px; color: white; text-decoration: none;">3 players</a>
-      <a href="4p_wbutton.html" style="display: block; padding: 10px; color: white; text-decoration: none;">4 players</a>
-      <a href="5p_wbutton.html" style="display: block; padding: 10px; color: white; text-decoration: none;">5 players</a>
-      <a href="6p_wbutton.html" style="display: block; padding: 10px; color: white; text-decoration: none;">6 players</a>
-      <a href="7p_wbutton.html" style="display: block; padding: 10px; color: white; text-decoration: none;">7 players</a>
-      <a href="8p_wbutton.html" style="display: block; padding: 10px; color: white; text-decoration: none;">8 players</a>
-      <a href="9p_wbutton.html" style="display: block; padding: 10px; color: white; text-decoration: none;">9 players</a>
+      <a href="#" style="display: block; padding: 10px; color: white; text-decoration: none;">3 players</a>
+      <a href="#" style="display: block; padding: 10px; color: white; text-decoration: none;">4 players</a>
+      <a href="#" style="display: block; padding: 10px; color: white; text-decoration: none;">5 players</a>
+      <a href="#" style="display: block; padding: 10px; color: white; text-decoration: none;">6 players</a>
+      <a href="#" style="display: block; padding: 10px; color: white; text-decoration: none;">7 players</a>
+      <a href="#" style="display: block; padding: 10px; color: white; text-decoration: none;">8 players</a>
+      <a href="#" style="display: block; padding: 10px; color: white; text-decoration: none;">9 players</a>
     </div>
   </div>
 </div>
@@ -191,6 +191,7 @@ button:hover {
 <div class="card-slot" id="b4" onclick="selectCard(this)">
 </div>
 </div>
+
 <div id="player-area">
 <div class="card-row" id="player-row">
 <div class="player-block" id="player1">
@@ -199,40 +200,47 @@ button:hover {
 <div class="card-slot" id="p1c1" onclick="selectCard(this)"></div>
 <div class="card-slot" id="p1c2" onclick="selectCard(this)"></div>
 </div>
-</div><br/><br/>
+</div><div></div><div></div><div></div>
 <div class="player-block" id="player2">
 <h3>Player 2</h3>
 <div class="card-row">
 <div class="card-slot" id="p2c1" onclick="selectCard(this)"></div>
 <div class="card-slot" id="p2c2" onclick="selectCard(this)"></div>
 </div>
-</div><br/><br/>
+</div>
+</div>
+
+<div class="card-row" id="player-row">
 <div class="player-block" id="player3">
 <h3>Player 3</h3>
 <div class="card-row">
 <div class="card-slot" id="p3c1" onclick="selectCard(this)"></div>
 <div class="card-slot" id="p3c2" onclick="selectCard(this)"></div>
 </div>
-</div><br/><br/>
+</div><div></div><div></div><div></div>
 <div class="player-block" id="player4">
 <h3>Player 4</h3>
 <div class="card-row">
 <div class="card-slot" id="p4c1" onclick="selectCard(this)"></div>
 <div class="card-slot" id="p4c2" onclick="selectCard(this)"></div>
 </div>
-</div><br/><br/>
+</div>
+</div>
+<div class="card-row" id="player-row">
 <div class="player-block" id="player5">
 <h3>Player 5</h3>
 <div class="card-row">
 <div class="card-slot" id="p5c1" onclick="selectCard(this)"></div>
 <div class="card-slot" id="p5c2" onclick="selectCard(this)"></div>
 </div>
-</div><br/><br/>
+</div><div></div><div></div><div></div>
 <div class="player-block" id="player6">
 <h3>Player 6</h3>
 <div class="card-row">
 <div class="card-slot" id="p6c1" onclick="selectCard(this)"></div>
 <div class="card-slot" id="p6c2" onclick="selectCard(this)"></div>
+</div>
+</div>
 </div>
 </div>
 
@@ -511,7 +519,7 @@ window.chooseCard = function(code, img) {
 
 // Reset function
 function resetAll() {
-  if (confirm("Reset Hand?")) {
+  if (confirm("คุณต้องการล้างข้อมูลทั้งหมดหรือไม่?")) {
     localStorage.removeItem('savedCards');
     localStorage.removeItem('outsHTML');
     location.reload();
