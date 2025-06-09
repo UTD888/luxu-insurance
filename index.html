@@ -1,0 +1,145 @@
+
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<title>CLUB LUXU</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <script src="script.js"></script>
+
+<h1>LUXU INSURANCE</h1>
+<button onclick="toggleRate()" style="margin-top:10px;">Show Rate</button>
+<h3>Board</h3>
+<div class="board">
+<div class="card-slot" id="b1" onclick="selectCard(this)"></div>
+<div class="card-slot" id="b2" onclick="selectCard(this)"></div>
+<div class="card-slot" id="b3" onclick="selectCard(this)"></div>
+<div class="card-slot" id="b4" onclick="selectCard(this)"></div>
+</div>
+
+<div>
+<h3>SELECT HANDS</h3>
+<button onclick="togglePlayer('p3-container')">P3</button>
+<button onclick="togglePlayer('p4-container')">P4</button>
+<button onclick="togglePlayer('p5-container')">P5</button>
+<button onclick="togglePlayer('p6-container')">P6</button>
+<button onclick="togglePlayer('p7-container')">P7</button>
+<button onclick="togglePlayer('p8-container')">P8</button>
+<button onclick="togglePlayer('p9-container')">P9</button>
+</div>
+
+<div class="player-row">
+<div class="player" id="p1-container"><div style="font-weight:bold; margin-bottom:4px;">P1</div>
+<div class="card-row">
+<div class="card-slot p-slot" id="p1c1" onclick="selectCard(this)"></div>
+<div class="card-slot p-slot" id="p1c2" onclick="selectCard(this)"></div>
+</div>
+<div class="outs-box" id="p1-outs"></div>
+</div>
+
+<div class="player" id="p2-container"><div style="font-weight:bold; margin-bottom:4px;">P2</div>
+<div class="card-row"><div class="card-slot" id="p2c1" onclick="selectCard(this)"></div>
+<div class="card-slot" id="p2c2" onclick="selectCard(this)"></div>
+</div>
+<div class="outs-box" id="p2-outs"></div>
+</div>
+</div>
+
+<div class="player-row">
+<div class="player" id="p3-container" style="display: none;"><div style="font-weight:bold; margin-bottom:4px;">P3</div>
+<div class="card-row"><div class="card-slot" id="p3c1" onclick="selectCard(this)"></div><div class="card-slot" id="p3c2" onclick="selectCard(this)"></div></div>
+<div class="outs-box" id="p3-outs"></div>
+</div>
+<div class="player" id="p4-container" style="display: none;"><div style="font-weight:bold; margin-bottom:4px;">P4</div>
+<div class="card-row"><div class="card-slot" id="p4c1" onclick="selectCard(this)"></div><div class="card-slot" id="p4c2" onclick="selectCard(this)"></div></div>
+<div class="outs-box" id="p4-outs"></div>
+</div>
+</div>
+
+<div class="player-row">
+<div class="player" id="p5-container" style="display: none;"><div style="font-weight:bold; margin-bottom:4px;">P5</div>
+<div class="card-row"><div class="card-slot" id="p5c1" onclick="selectCard(this)"></div><div class="card-slot" id="p5c2" onclick="selectCard(this)"></div></div>
+<div class="outs-box" id="p5-outs"></div>
+</div>
+<div class="player" id="p6-container" style="display: none;"><div style="font-weight:bold; margin-bottom:4px;">P6</div>
+<div class="card-row"><div class="card-slot" id="p6c1" onclick="selectCard(this)"></div><div class="card-slot" id="p6c2" onclick="selectCard(this)"></div></div>
+<div class="outs-box" id="p6-outs"></div>
+</div>
+</div>
+
+<div class="player-row">
+<div class="player" id="p7-container" style="display: none;"><div style="font-weight:bold; margin-bottom:4px;">P7</div>
+<div class="card-row"><div class="card-slot" id="p7c1" onclick="selectCard(this)"></div><div class="card-slot" id="p7c2" onclick="selectCard(this)"></div></div>
+<div class="outs-box" id="p7-outs"></div>
+</div>
+<div class="player" id="p8-container" style="display: none;"><div style="font-weight:bold; margin-bottom:4px;">P8</div>
+<div class="card-row"><div class="card-slot" id="p8c1" onclick="selectCard(this)"></div><div class="card-slot" id="p8c2" onclick="selectCard(this)"></div></div>
+<div class="outs-box" id="p8-outs"></div>
+</div>
+</div>
+
+<div class="player-row">
+<div class="player" id="p9-container" style="display: none;"><div style="font-weight:bold; margin-bottom:4px;">P9</div>
+<div class="card-row"><div class="card-slot" id="p9c1" onclick="selectCard(this)"></div><div class="card-slot" id="p9c2" onclick="selectCard(this)"></div></div>
+<div class="outs-box" id="p9-outs"></div>
+</div>
+</div>
+
+
+<button id="reset" onclick="resetAll()">Reset All</button>
+
+<!-- CARD POPUP -->
+<div id="card-popup" style="display:none; position:fixed; top:10%; left:5%; width:90%; height:80%; background:color #fff; border-radius:10px; box-shadow:0 0 20px rgba(0,0,0,0.5); z-index:9999; overflow:auto;">
+<div style="text-align:right; padding:10px;">
+<button onclick="closePopup()" style="font-size:18px; padding:4px 12px;">✖</button>
+</div>
+<div style="display:flex; justify-content:center; gap:10px; margin-bottom:10px;">
+<button class="tab-btn" onclick="showTab('clubs')">♣ Clubs</button>
+<button class="tab-btn" onclick="showTab('diamonds')">♦ Diamonds</button>
+<button class="tab-btn" onclick="showTab('hearts')">♥ Hearts</button>
+<button class="tab-btn" onclick="showTab('spades')">♠ Spades</button>
+</div>
+<div class="tab-content" id="clubs" style="display:flex; flex-wrap:wrap; justify-content:center;"></div>
+<div class="tab-content" id="diamonds" style="display:none; flex-wrap:wrap; justify-content:center;"></div>
+<div class="tab-content" id="hearts" style="display:none; flex-wrap:wrap; justify-content:center;"></div>
+<div class="tab-content" id="spades" style="display:none; flex-wrap:wrap; justify-content:center;"></div>
+</div>
+
+<!-- DETAILED OUTs BOX -->
+<button onclick="toggleDetails()" style="margin-top:30px;">Show Details</button>
+<div id="detailed-outs-box" style="display:none; margin-top:-10px; padding:10px; border:1px solid #ccc; font-family:monospace;font-size: 16px;"></div>
+<!-- RATE POPUP -->
+<div id="rate-popup" style="display:none; position:fixed; top:10%; left:5%; width:90%; max-width:500px; background:#fff; border-radius:10px; box-shadow:0 0 20px rgba(0,0,0,0.5); z-index:9999; padding:20px; text-align:center;">
+  <div style="text-align:right; margin-bottom:10px;">
+    <button onclick="toggleRate()" style="font-size:18px; padding:4px 12px;">✖</button>
+  </div>
+  <h3>OUTs to Rate Table</h3>
+  <table style="width:100%; border-collapse: collapse; font-size:16px;">
+    <thead>
+      <tr style="background:#007bff; color:white;">
+        <th style="padding:8px; border:1px solid #ccc;">OUTs</th>
+        <th style="padding:8px; border:1px solid #ccc;">Rate</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr><td style="padding:6px; border:1px solid #ccc;">1</td><td style="padding:6px; border:1px solid #ccc;">30x</td></tr>
+      <tr><td>2</td><td>15x</td></tr>
+      <tr><td>3</td><td>10x</td></tr>
+      <tr><td>4</td><td>8x</td></tr>
+      <tr><td>5</td><td>6x</td></tr>
+      <tr><td>6</td><td>5x</td></tr>
+      <tr><td>7</td><td>4x</td></tr>
+      <tr><td>8</td><td>3.5x</td></tr>
+      <tr><td>9</td><td>3x</td></tr>
+      <tr><td>10</td><td>2.5x</td></tr>
+      <tr><td>11</td><td>2x</td></tr>
+      <tr><td>12</td><td>1.5x</td></tr>
+    </tbody>
+  </table>
+</div>
+</body>
+</html>
