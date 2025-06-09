@@ -1,9 +1,0 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="240" height="360" viewBox="0 0 250 370">
-  <rect x="5" y="5" width="240" height="360" rx="16" ry="16" fill="#fff" stroke="#000" stroke-width="2"/>
-  <text x="20" y="65" font-size="64" font-family="Times New Roman, serif"
-        fill="#000" font-weight="bold" text-anchor="start" dominant-baseline="top">10</text>
-  <text x="125.0" y="265.0" 
-        font-size="240.0" text-anchor="middle" font-family="Georgia, serif" fill="#000">
-    ♠
-  </text>
-</svg>
