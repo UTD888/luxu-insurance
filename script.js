@@ -320,3 +320,10 @@ window.addEventListener("load", () => {
   restoreSelectedCards();
   updateUsedCards();
 });
+
+function toggleRate() {
+  const popup = document.getElementById("rate-popup");
+  if (!popup) return;
+  const current = popup.style.display;
+  popup.style.display = (current === "block") ? "none" : "block";
+}
